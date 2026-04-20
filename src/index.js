@@ -32,8 +32,9 @@ function corsHeaders() {
 
 // Serve the SPA index.html for any slug route
 async function serveSPA(env, request) {
-  const spaUrl = new URL('/index.html', request.url);
-  return env.ASSETS.fetch(new Request(spaUrl.toString(), request));
+  const url = new URL(request.url);
+  url.pathname = '/index.html';
+  return env.ASSETS.fetch(url.toString());
 }
 
 // ── API handlers ──────────────────────────────────────────────────────────────
