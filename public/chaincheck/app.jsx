@@ -219,7 +219,7 @@ function App() {
       <div className="cc-stage">
         <div className="cc-topbar">
           <div className="cc-logo">
-            <img src="/assets/logo-wordmark.png" alt="Marketing Madheads"
+            <img src="/assets/logo_mm_wit.png" alt="Marketing Madheads"
               onError={e => { e.currentTarget.style.display = "none"; }} />
           </div>
         </div>
