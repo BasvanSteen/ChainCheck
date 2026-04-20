@@ -46,21 +46,6 @@ function Welcome({ meta, accent, onStart, chains }) {
         </ul>
       )}
 
-      <div className="cc-preview-chain">
-        {chains.map((c) => {
-          const Icon = CHAIN_ICONS[c.id] || CHAIN_ICONS.doelgroep;
-          const color = CHAIN_COLORS[c.id] || accent;
-          return (
-            <div key={c.id} className="cc-preview-link">
-              <div className="cc-preview-circle" style={{ color }}>
-                <Icon size={28} color={color} />
-              </div>
-              <span>{c.title}</span>
-            </div>
-          );
-        })}
-      </div>
-
       <div className="cc-welcome-cta">
         <CCButton onClick={onStart} accent={accent} size="sm">Start de check</CCButton>
         <span className="cc-foot-inline">{welcome.timeEstimate}</span>

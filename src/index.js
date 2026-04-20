@@ -1,4 +1,4 @@
-import questionnaires from './sets/questionnaires.json';
+import questionnaires from './sets/index.js';
 
 // Build lookup maps for fast access by id and by slug
 const byId   = Object.fromEntries(questionnaires.map(q => [q.id,   q]));
