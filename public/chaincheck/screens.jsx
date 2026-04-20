@@ -100,7 +100,7 @@ function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect,
         accent={accent}
       />
 
-      <div className="cc-question-body">
+      <div className="cc-question-body" key={`${chainIndex}-${qIndex}`}>
         <div className="cc-q-block">
           <div className="cc-q-text">{question.q}</div>
           <div className="cc-q-options">

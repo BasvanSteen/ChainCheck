@@ -53,9 +53,7 @@ function ChainProgress({ chains, currentIndex, questionsDone, totalQuestions, st
         {chains.map((c, i) => {
           const Icon = CHAIN_ICONS[c.id] || CHAIN_ICONS.doelgroep;
           const state = i < currentIndex ? "done" : i === currentIndex ? "active" : "todo";
-          const tint = state === "active" ? accent
-            : state === "done" ? (CHAIN_COLORS[c.id] || accent)
-            : "#CBD5DB";
+          const tint = state === "active" || state === "done" ? accent : "#CBD5DB";
           return (
             <div key={c.id} className={`cc-klink cc-klink--${state}`}>
               <div className="cc-klink-icon" style={{ color: tint }}>
