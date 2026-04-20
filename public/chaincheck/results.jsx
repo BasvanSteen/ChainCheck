@@ -82,7 +82,20 @@ function ScoreDial({ value, accent }) {
   );
 }
 
-function Results({ answers, chains, chainVerdict, accent, meta, onRestart, onEdit, responseId, readOnly }) {
+function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart, onEdit, responseId, readOnly }) {
+  const [calendly, setCalendly] = React.useState(null);
+
+  React.useEffect(() => {
+    if (!slug) return;
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ responseId: responseId || '', slug }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.calendly) setCalendly(d.calendly); })
+      .catch(() => {});
+  }, [slug, responseId]);
   const perChain = chains.map((c) => {
     let s = 0;
     const ans = answers[c.id] || [];
@@ -215,7 +228,7 @@ function Results({ answers, chains, chainVerdict, accent, meta, onRestart, onEdi
         </div>
         <div className="cc-cta-right">
           <CCButton accent={accent} size="sm"
-            onClick={() => { if (cta.buttonUrl) window.open(cta.buttonUrl, "_blank"); }}>
+            onClick={() => { const url = calendly || cta.buttonUrl; if (url) window.open(url, "_blank"); }}>
             {cta.buttonLabel || "Plan een call"}
           </CCButton>
           <button className="cc-cta-restart" onClick={onRestart}>Opnieuw doen</button>

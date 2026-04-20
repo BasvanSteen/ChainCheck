@@ -1,11 +1,14 @@
-import defaultSet from './sets/default.json';
+import questionnaires from './sets/questionnaires.json';
 
-// Registry of all available question sets
-const SETS = {
-  default: defaultSet,
-};
+// Build lookup maps for fast access by id and by slug
+const byId   = Object.fromEntries(questionnaires.map(q => [q.id,   q]));
+const bySlug = Object.fromEntries(questionnaires.map(q => [q.slug, q]));
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+function findSet(identifier) {
+  return bySlug[identifier] ?? byId[identifier] ?? null;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -17,7 +20,7 @@ function json(data, status = 200) {
   });
 }
 
-function corsPreflightHeaders() {
+function corsHeaders() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',
@@ -27,76 +30,71 @@ function corsPreflightHeaders() {
   });
 }
 
-// ── Route handlers ────────────────────────────────────────────────────────────
+// Serve the SPA index.html for any slug route
+async function serveSPA(env, request) {
+  const spaUrl = new URL('/index.html', request.url);
+  return env.ASSETS.fetch(new Request(spaUrl.toString(), request));
+}
 
-async function getSets() {
-  const list = Object.values(SETS).map(s => ({
-    id: s.id,
-    version: s.version,
-    title: s.meta.welcome.title,
+// ── API handlers ──────────────────────────────────────────────────────────────
+
+function handleGetSets() {
+  const list = questionnaires.map(q => ({
+    id: q.id,
+    slug: q.slug,
+    name: q.name,
+    version: q.version,
+    tag: q.tag,
   }));
   return json(list);
 }
 
-async function getSet(setId) {
-  const set = SETS[setId];
+function handleGetSet(identifier) {
+  const set = findSet(identifier);
   if (!set) return json({ error: 'Not found' }, 404);
-  return json(set);
+  // Strip internal fields before sending to frontend
+  const { pipelineId, calendly, ...rest } = set;
+  return json(rest);
 }
 
-async function saveResponse(request, env) {
-  if (!env.RESPONSES) return json({ error: 'Storage not configured yet' }, 501);
+async function handleSaveResponse(request, env) {
+  if (!env.RESPONSES) return json({ error: 'Storage not configured' }, 501);
 
   let body;
-  try {
-    body = await request.json();
-  } catch {
-    return json({ error: 'Invalid JSON' }, 400);
-  }
+  try { body = await request.json(); }
+  catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  const { setId, version, answers } = body;
-  if (!setId || !version || !answers) {
-    return json({ error: 'Missing required fields: setId, version, answers' }, 400);
+  const { slug, version, answers } = body;
+  if (!slug || !version || !answers) {
+    return json({ error: 'Missing required fields: slug, version, answers' }, 400);
   }
-  if (!SETS[setId]) {
-    return json({ error: `Unknown setId: ${setId}` }, 400);
-  }
+  if (!findSet(slug)) return json({ error: `Unknown slug: ${slug}` }, 400);
 
   const id = crypto.randomUUID();
-  const record = {
-    id,
-    setId,
-    version,
-    answers,
+  await env.RESPONSES.put(`response:${id}`, JSON.stringify({
+    id, slug, version, answers,
     createdAt: new Date().toISOString(),
     updatedAt: null,
-  };
-
-  await env.RESPONSES.put(`response:${id}`, JSON.stringify(record), {
-    expirationTtl: 60 * 60 * 24 * 365,
-  });
+  }), { expirationTtl: 60 * 60 * 24 * 365 });
 
   return json({ id }, 201);
 }
 
-async function getResponse(id, env) {
-  if (!env.RESPONSES) return json({ error: 'Storage not configured yet' }, 501);
+async function handleGetResponse(id, env) {
+  if (!env.RESPONSES) return json({ error: 'Storage not configured' }, 501);
   const raw = await env.RESPONSES.get(`response:${id}`);
   if (!raw) return json({ error: 'Not found' }, 404);
   return json(JSON.parse(raw));
 }
 
-async function updateResponse(id, request, env) {
-  if (!env.RESPONSES) return json({ error: 'Storage not configured yet' }, 501);
+async function handleUpdateResponse(id, request, env) {
+  if (!env.RESPONSES) return json({ error: 'Storage not configured' }, 501);
   const raw = await env.RESPONSES.get(`response:${id}`);
   if (!raw) return json({ error: 'Not found' }, 404);
 
   let body;
-  try {
-    body = await request.json();
-  } catch {
-    return json({ error: 'Invalid JSON' }, 400);
-  }
+  try { body = await request.json(); }
+  catch { return json({ error: 'Invalid JSON' }, 400); }
 
   const existing = JSON.parse(raw);
   const updated = {
@@ -105,12 +103,37 @@ async function updateResponse(id, request, env) {
     version: body.version ?? existing.version,
     updatedAt: new Date().toISOString(),
   };
-
   await env.RESPONSES.put(`response:${id}`, JSON.stringify(updated), {
     expirationTtl: 60 * 60 * 24 * 365,
   });
-
   return json(updated);
+}
+
+// Stub for future external API integration (CRM pipeline, Calendly, etc.)
+async function handleSubmit(request, env) {
+  let body;
+  try { body = await request.json(); }
+  catch { return json({ error: 'Invalid JSON' }, 400); }
+
+  const { responseId, slug } = body;
+  if (!responseId || !slug) {
+    return json({ error: 'Missing required fields: responseId, slug' }, 400);
+  }
+
+  const set = findSet(slug);
+  if (!set) return json({ error: `Unknown slug: ${slug}` }, 400);
+
+  // TODO: connect to external system
+  // - set.pipelineId → CRM pipeline trigger
+  // - set.calendly   → Calendly scheduling link / API
+  // Example:
+  // await fetch('https://api.crm.example.com/pipeline', {
+  //   method: 'POST',
+  //   headers: { Authorization: `Bearer ${env.CRM_API_KEY}` },
+  //   body: JSON.stringify({ pipelineId: set.pipelineId, responseId }),
+  // });
+
+  return json({ ok: true, calendly: set.calendly });
 }
 
 // ── Main entry ────────────────────────────────────────────────────────────────
@@ -118,41 +141,45 @@ async function updateResponse(id, request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const path = url.pathname;
 
-    if (request.method === 'OPTIONS') {
-      return corsPreflightHeaders();
-    }
+    if (request.method === 'OPTIONS') return corsHeaders();
 
-    if (url.pathname.startsWith('/api/')) {
-      const path = url.pathname.slice(4); // strip '/api'
+    // ── API routes ────────────────────────────────────────────────────────────
+    if (path.startsWith('/api/')) {
+      const route = path.slice(4); // strip '/api'
 
-      // GET /api/sets
-      if (path === '/sets' && request.method === 'GET') {
-        return getSets();
-      }
+      if (route === '/sets' && request.method === 'GET')
+        return handleGetSets();
 
-      // GET /api/sets/:id
-      const setMatch = path.match(/^\/sets\/([a-z0-9_-]+)$/);
-      if (setMatch && request.method === 'GET') {
-        return getSet(setMatch[1]);
-      }
+      const setMatch = route.match(/^\/sets\/([a-z0-9_-]+)$/);
+      if (setMatch && request.method === 'GET')
+        return handleGetSet(setMatch[1]);
 
-      // POST /api/responses
-      if (path === '/responses' && request.method === 'POST') {
-        return saveResponse(request, env);
-      }
+      if (route === '/responses' && request.method === 'POST')
+        return handleSaveResponse(request, env);
 
-      // GET /api/responses/:id  or  PUT /api/responses/:id
-      const respMatch = path.match(/^\/responses\/([0-9a-f-]{36})$/i);
+      const respMatch = route.match(/^\/responses\/([0-9a-f-]{36})$/i);
       if (respMatch) {
-        if (request.method === 'GET') return getResponse(respMatch[1], env);
-        if (request.method === 'PUT') return updateResponse(respMatch[1], request, env);
+        if (request.method === 'GET') return handleGetResponse(respMatch[1], env);
+        if (request.method === 'PUT') return handleUpdateResponse(respMatch[1], request, env);
       }
+
+      if (route === '/submit' && request.method === 'POST')
+        return handleSubmit(request, env);
 
       return json({ error: 'Not found' }, 404);
     }
 
-    // Serve static assets for everything else
-    return env.ASSETS.fetch(request);
+    // ── Static assets (JS, CSS, fonts, images) ────────────────────────────────
+    // Pass through requests for files with extensions to the asset handler
+    if (path.includes('.')) {
+      return env.ASSETS.fetch(request);
+    }
+
+    // ── Slug routes → serve SPA ───────────────────────────────────────────────
+    // e.g. /intake, /marketing-check → serve index.html
+    // The frontend reads the slug from window.location.pathname
+    return serveSPA(env, request);
   },
 };

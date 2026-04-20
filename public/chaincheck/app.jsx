@@ -1,28 +1,25 @@
 // ChainCheck — App root
-/* global React, ReactDOM, CHAIN_ICONS, CHAIN_COLORS, Welcome, QuestionScreen, Results, VersionMismatch, CCButton */
+/* global React, ReactDOM, CHAIN_ICONS, CHAIN_COLORS, Welcome, QuestionScreen, Results, VersionMismatch */
 
 const { useState, useEffect } = React;
 
-// ── Scoring functions (client-side, version-independent) ──────────────────────
+// ── Scoring (uses verdict texts from the question set JSON) ───────────────────
 
 function chainVerdict(chain, score) {
   const max = chain.questions.length * 3;
   const pct = score / max;
-  if (pct >= 0.75) return {
-    level: "sterk", tone: "good",
-    summary: `Je ${chain.title}-schakel staat stevig. Blijf testen en meten — zelfs kleine verbeteringen leveren hier veel op.`,
-  };
-  if (pct >= 0.4) return {
-    level: "aandacht", tone: "warn",
-    summary: `Je hebt een begin, maar je ${chain.title}-schakel mist scherpte. Hier liggen concrete kansen om meer uit je inspanningen te halen.`,
-  };
-  return {
-    level: "zwak", tone: "weak",
-    summary: `Dit is een zwakke schakel. Zonder grip op ${chain.title} verlies je klanten zonder dat je het doorhebt.`,
-  };
+  const v = chain.verdicts || {};
+  if (pct >= 0.75) return { tone: "good",  summary: v.strong || "" };
+  if (pct >= 0.40) return { tone: "warn",  summary: v.warn   || "" };
+  return               { tone: "weak",  summary: v.weak   || "" };
 }
 
 // ── URL helpers ───────────────────────────────────────────────────────────────
+
+function getSlug() {
+  const path = window.location.pathname.replace(/^\//, "").replace(/\/$/, "");
+  return path || "default";
+}
 
 function getParams() {
   return new URLSearchParams(window.location.search);
@@ -44,10 +41,10 @@ function deleteParam(key) {
 // ── App ───────────────────────────────────────────────────────────────────────
 
 function App() {
-  // Data
   const [loadState, setLoadState] = useState("loading"); // loading | ready | error
   const [chains, setChains] = useState([]);
   const [setMeta, setSetMeta] = useState({});
+  const [currentSlug, setCurrentSlug] = useState("");
 
   // Navigation: 'welcome' | {chainIndex, qIndex} | 'results' | 'version-mismatch'
   const [view, setView] = useState("welcome");
@@ -61,20 +58,18 @@ function App() {
   const [readOnly, setReadOnly] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Progress style (could be persisted to localStorage if desired)
-  const [progressStyle] = useState("ketting");
-
+  const progressStyle = "ketting";
   const accent = "#EE3D96";
 
-  // ── Load question set (and optional saved response) on mount ──────────────
+  // ── Load question set + optional saved response on mount ──────────────────
 
   useEffect(() => {
-    const params = getParams();
-    const setId = params.get("set") || "default";
-    const respId = params.get("response");
+    const slug = getSlug();
+    const respId = getParams().get("response");
+    setCurrentSlug(slug);
 
-    const fetchSet = fetch(`/api/sets/${setId}`).then(r => {
-      if (!r.ok) throw new Error(`Question set "${setId}" not found`);
+    const fetchSet = fetch(`/api/sets/${slug}`).then(r => {
+      if (!r.ok) throw new Error(`Vragenlijst "${slug}" niet gevonden`);
       return r.json();
     });
 
@@ -85,19 +80,14 @@ function App() {
     Promise.all([fetchSet, fetchResp])
       .then(([set, resp]) => {
         setChains(set.chains);
-        setSetMeta({ id: set.id, version: set.version, ...set.meta });
+        setSetMeta({ id: set.id, slug: set.slug, version: set.version, ...set.meta });
 
         if (resp && !resp.error) {
           setResponseId(resp.id);
           setSavedVersion(resp.version);
           setAnswers(resp.answers || {});
-
-          if (resp.version !== set.version) {
-            setView("version-mismatch");
-          } else {
-            setView("results");
-            setReadOnly(true);
-          }
+          setView(resp.version !== set.version ? "version-mismatch" : "results");
+          if (resp.version === set.version) setReadOnly(true);
         }
 
         setLoadState("ready");
@@ -105,16 +95,18 @@ function App() {
       .catch(() => setLoadState("error"));
   }, []);
 
-  // ── Navigation helpers ────────────────────────────────────────────────────
+  // ── Computed ──────────────────────────────────────────────────────────────
 
   const totalQuestions = chains.reduce((a, c) => a + c.questions.length, 0);
-  const totalAnswered = Object.values(answers).reduce((a, arr) => a + arr.filter(x => x != null).length, 0);
+  const totalAnswered  = Object.values(answers).reduce((a, arr) => a + arr.filter(x => x != null).length, 0);
 
   function currentSelected() {
     if (typeof view !== "object") return null;
     const c = chains[view.chainIndex];
     return answers[c.id]?.[view.qIndex] ?? null;
   }
+
+  // ── Navigation ────────────────────────────────────────────────────────────
 
   function onSelect(optIndex) {
     if (typeof view !== "object") return;
@@ -137,7 +129,6 @@ function App() {
   }
 
   function onPrev() {
-    if (view === "welcome") return;
     if (view === "results") {
       const last = chains.length - 1;
       setView({ chainIndex: last, qIndex: chains[last].questions.length - 1 });
@@ -155,68 +146,43 @@ function App() {
     }
   }
 
-  // ── Save response ─────────────────────────────────────────────────────────
+  // ── Save ──────────────────────────────────────────────────────────────────
 
   async function saveAndShowResults() {
     setSaving(true);
-    const params = getParams();
-    const setId = params.get("set") || "default";
-
     try {
       const isUpdate = !!responseId;
-      const url = isUpdate ? `/api/responses/${responseId}` : "/api/responses";
+      const url    = isUpdate ? `/api/responses/${responseId}` : "/api/responses";
       const method = isUpdate ? "PUT" : "POST";
 
-      const res = await fetch(url, {
+      const res  = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ setId: setMeta.id, version: setMeta.version, answers }),
+        body: JSON.stringify({ slug: currentSlug, version: setMeta.version, answers }),
       });
-
       const data = await res.json();
-      const id = data.id || responseId;
+      const id   = data.id || responseId;
 
-      setResponseId(id);
-      setParam("set", setId);
-      setParam("response", id);
+      if (id) {
+        setResponseId(id);
+        setParam("response", id);
+      }
     } catch (e) {
       console.error("Save failed:", e);
     }
-
     setSaving(false);
     setView("results");
   }
 
   // ── User actions ──────────────────────────────────────────────────────────
 
-  function onStart() {
-    setAnswers({});
-    setReadOnly(false);
-    setView({ chainIndex: 0, qIndex: 0 });
-  }
-
-  function onEdit() {
-    setReadOnly(false);
-    setView({ chainIndex: 0, qIndex: 0 });
-  }
-
-  function onRetake() {
-    setAnswers({});
-    setReadOnly(false);
-    setSavedVersion(null);
-    setView({ chainIndex: 0, qIndex: 0 });
-  }
-
-  function onViewOld() {
-    setReadOnly(true);
-    setView("results");
-  }
+  function onStart()   { setAnswers({}); setReadOnly(false); setView({ chainIndex: 0, qIndex: 0 }); }
+  function onEdit()    { setReadOnly(false); setView({ chainIndex: 0, qIndex: 0 }); }
+  function onRetake()  { setAnswers({}); setReadOnly(false); setSavedVersion(null); setView({ chainIndex: 0, qIndex: 0 }); }
+  function onViewOld() { setReadOnly(true); setView("results"); }
 
   function onRestart() {
-    setAnswers({});
-    setResponseId(null);
-    setSavedVersion(null);
-    setReadOnly(false);
+    setAnswers({}); setResponseId(null); setSavedVersion(null); setReadOnly(false);
     deleteParam("response");
     setView("welcome");
   }
@@ -227,9 +193,7 @@ function App() {
     return (
       <div className="cc-app">
         <div className="cc-stage">
-          <div className="cc-loading">
-            <div className="cc-loading-spinner" />
-          </div>
+          <div className="cc-loading"><div className="cc-loading-spinner" /></div>
         </div>
       </div>
     );
@@ -241,8 +205,8 @@ function App() {
         <div className="cc-stage">
           <div className="cc-window">
             <div className="cc-screen" style={{ padding: "40px 0" }}>
-              <p style={{ fontSize: 18 }}>Er is iets misgegaan bij het laden.</p>
-              <p style={{ color: "#6F8591", marginTop: 8 }}>Controleer de URL en vernieuw de pagina.</p>
+              <p style={{ fontSize: 18 }}>Vragenlijst niet gevonden.</p>
+              <p style={{ color: "#6F8591", marginTop: 8 }}>Controleer de URL en probeer opnieuw.</p>
             </div>
           </div>
         </div>
@@ -262,12 +226,7 @@ function App() {
 
         <div className="cc-window">
           {view === "welcome" && (
-            <Welcome
-              meta={setMeta}
-              accent={accent}
-              onStart={onStart}
-              chains={chains}
-            />
+            <Welcome meta={setMeta} accent={accent} onStart={onStart} chains={chains} />
           )}
 
           {typeof view === "object" && (
@@ -296,6 +255,7 @@ function App() {
               chainVerdict={chainVerdict}
               accent={accent}
               meta={setMeta}
+              slug={currentSlug}
               onRestart={onRestart}
               onEdit={readOnly ? onEdit : null}
               responseId={responseId}
