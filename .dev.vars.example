@@ -1,0 +1,8 @@
+# Kopieer dit bestand naar .dev.vars en vul de lokale waarden in.
+# .dev.vars wordt NIET gecommit (staat in .gitignore).
+
+# URL van de lokale tweede applicatie
+EXTERNAL_API_URL=http://localhost:3000
+
+# API-sleutel voor de externe applicatie (optioneel in dev)
+EXTERNAL_API_KEY=dev-key

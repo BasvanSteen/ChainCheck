@@ -109,7 +109,8 @@ async function handleUpdateResponse(id, request, env) {
   return json(updated);
 }
 
-// Stub for future external API integration (CRM pipeline, Calendly, etc.)
+// Submit handler — triggers external API (CRM pipeline, Calendly, etc.)
+// env.EXTERNAL_API_URL comes from .dev.vars locally, [vars] in production
 async function handleSubmit(request, env) {
   let body;
   try { body = await request.json(); }
@@ -123,15 +124,29 @@ async function handleSubmit(request, env) {
   const set = findSet(slug);
   if (!set) return json({ error: `Unknown slug: ${slug}` }, 400);
 
-  // TODO: connect to external system
-  // - set.pipelineId → CRM pipeline trigger
-  // - set.calendly   → Calendly scheduling link / API
-  // Example:
-  // await fetch('https://api.crm.example.com/pipeline', {
-  //   method: 'POST',
-  //   headers: { Authorization: `Bearer ${env.CRM_API_KEY}` },
-  //   body: JSON.stringify({ pipelineId: set.pipelineId, responseId }),
-  // });
+  const externalUrl = env.EXTERNAL_API_URL;
+
+  if (externalUrl) {
+    try {
+      await fetch(`${externalUrl}/api/chaincheck/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(env.EXTERNAL_API_KEY ? { 'Authorization': `Bearer ${env.EXTERNAL_API_KEY}` } : {}),
+        },
+        body: JSON.stringify({
+          responseId,
+          pipelineId: set.pipelineId,
+          slug: set.slug,
+          name: set.name,
+          tag: set.tag,
+        }),
+      });
+    } catch (e) {
+      // Log but don't block — returning calendly link is more important
+      console.error('External API call failed:', e.message);
+    }
+  }
 
   return json({ ok: true, calendly: set.calendly });
 }
