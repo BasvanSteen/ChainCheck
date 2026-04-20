@@ -1,0 +1,108 @@
+/* Marketing Madheads — design tokens */
+
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Regular.ttf") format("truetype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Italic.ttf") format("truetype");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Medium.ttf") format("truetype");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-MediumItalic.ttf") format("truetype");
+  font-weight: 500; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-SemiBold.ttf") format("truetype");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Bold.ttf") format("truetype");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-ExtraBold.ttf") format("truetype");
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Black.ttf") format("truetype");
+  font-weight: 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url("/fonts/Poppins-Light.ttf") format("truetype");
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+
+:root {
+  --mm-navy:        #002E48;
+  --mm-navy-80:     rgba(0, 46, 72, 0.8);
+  --mm-navy-60:     rgba(0, 46, 72, 0.6);
+  --mm-navy-10:     rgba(0, 46, 72, 0.1);
+  --mm-pink:        #EE3D96;
+  --mm-pink-hover:  #D8327F;
+  --mm-pink-10:     rgba(238, 61, 150, 0.1);
+  --mm-sky:         #89D2DC;
+  --mm-sky-25:      rgba(137, 210, 220, 0.25);
+  --mm-sky-50:      rgba(137, 210, 220, 0.5);
+  --mm-cream:       #F0EBCD;
+  --mm-mint:        #AFFFA5;
+  --mm-yellow:      #FCBB15;
+  --mm-grey-100:    #F4F4F4;
+  --mm-grey-200:    #ECECEC;
+  --mm-grey-500:    #767676;
+  --mm-black:       #000000;
+  --mm-white:       #FFFFFF;
+
+  --fg-1:     var(--mm-navy);
+  --fg-2:     var(--mm-navy-80);
+  --fg-inv:   var(--mm-white);
+  --bg-page:  var(--mm-white);
+  --bg-soft:  var(--mm-sky-25);
+  --bg-dark:  var(--mm-navy);
+  --accent:   var(--mm-pink);
+  --stroke:   var(--mm-navy);
+
+  --font-sans:    "Poppins", system-ui, -apple-system, Segoe UI, sans-serif;
+  --font-display: "Poppins", system-ui, sans-serif;
+
+  --r-sm:   10px;
+  --r-md:   25px;
+  --r-pill: 999px;
+
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+
+  --shadow-card: 0 4px 24px rgba(0,0,0,.08);
+  --shadow-menu: 0 8px 32px rgba(0,0,0,.10);
+  --ease-out: cubic-bezier(.2,.7,.3,1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+}
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg-page);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; margin: 0; }
+p { margin: 0; }
+*, *::before, *::after { box-sizing: border-box; }
