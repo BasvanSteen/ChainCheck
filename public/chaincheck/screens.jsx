@@ -54,6 +54,37 @@ function Welcome({ meta, accent, onStart, chains }) {
   );
 }
 
+function ChainIntroScreen({ chain, chains, chainIndex, onNext, onPrev, progressStyle, accent, totalAnswered, totalQuestions }) {
+  const Icon = CHAIN_ICONS[chain.id] || CHAIN_ICONS.doelgroep;
+  return (
+    <div className="cc-screen cc-chain-intro">
+      <ChainProgress
+        chains={chains}
+        currentIndex={chainIndex}
+        questionsDone={totalAnswered}
+        totalQuestions={totalQuestions}
+        style={progressStyle}
+        accent={accent}
+      />
+
+      <div className="cc-chain-intro-body">
+        <div className="cc-chain-intro-icon" style={{ color: accent }}>
+          <Icon size={36} color={accent} />
+        </div>
+        <h2 className="cc-chain-title" style={{ color: accent }}>{chain.title}</h2>
+        <p className="cc-chain-lead">{chain.lead}</p>
+      </div>
+
+      <div className="cc-nav">
+        <button className="cc-nav-back" onClick={onPrev} aria-label="Vorige">
+          <IconArrowLeft size={14} /> <span>Vorige</span>
+        </button>
+        <CCButton onClick={onNext} accent={accent} size="sm">Volgende</CCButton>
+      </div>
+    </div>
+  );
+}
+
 function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect, onNext, onPrev, canNext, progressStyle, accent, totalAnswered, totalQuestions, saving }) {
   const question = chain.questions[qIndex];
   const isLast = chainIndex === chains.length - 1 && qIndex === chain.questions.length - 1;
@@ -70,9 +101,6 @@ function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect,
       />
 
       <div className="cc-question-body">
-        <h2 className="cc-chain-title" style={{ color: accent }}>{chain.title}</h2>
-        <p className="cc-chain-lead">{chain.lead}</p>
-
         <div className="cc-q-block">
           <div className="cc-q-text">{question.q}</div>
           <div className="cc-q-options">
@@ -98,11 +126,9 @@ function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect,
       </div>
 
       <div className="cc-nav">
-        {chainIndex > 0 || qIndex > 0 ? (
-          <button className="cc-nav-back" onClick={onPrev} aria-label="Vorige">
-            <IconArrowLeft size={14} /> <span>Vorige</span>
-          </button>
-        ) : <span />}
+        <button className="cc-nav-back" onClick={onPrev} aria-label="Vorige">
+          <IconArrowLeft size={14} /> <span>Vorige</span>
+        </button>
         <CCButton onClick={onNext} accent={accent} disabled={!canNext || saving} size="sm">
           {saving ? "Opslaan…" : isLast ? "Toon resultaat" : "Volgende"}
         </CCButton>
@@ -143,5 +169,6 @@ function VersionMismatch({ savedVersion, currentVersion, accent, onViewOld, onRe
 
 window.CCButton = CCButton;
 window.Welcome = Welcome;
+window.ChainIntroScreen = ChainIntroScreen;
 window.QuestionScreen = QuestionScreen;
 window.VersionMismatch = VersionMismatch;

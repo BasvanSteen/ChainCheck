@@ -1,5 +1,5 @@
 // ChainCheck — App root
-/* global React, ReactDOM, CHAIN_ICONS, CHAIN_COLORS, Welcome, QuestionScreen, Results, VersionMismatch */
+/* global React, ReactDOM, CHAIN_ICONS, CHAIN_COLORS, Welcome, ChainIntroScreen, QuestionScreen, Results, VersionMismatch */
 
 const { useState, useEffect } = React;
 
@@ -119,10 +119,12 @@ function App() {
   function onNext() {
     if (typeof view !== "object") return;
     const c = chains[view.chainIndex];
-    if (view.qIndex + 1 < c.questions.length) {
+    if (view.qIndex === -1) {
+      setView({ chainIndex: view.chainIndex, qIndex: 0 });
+    } else if (view.qIndex + 1 < c.questions.length) {
       setView({ chainIndex: view.chainIndex, qIndex: view.qIndex + 1 });
     } else if (view.chainIndex + 1 < chains.length) {
-      setView({ chainIndex: view.chainIndex + 1, qIndex: 0 });
+      setView({ chainIndex: view.chainIndex + 1, qIndex: -1 });
     } else {
       saveAndShowResults();
     }
@@ -135,13 +137,15 @@ function App() {
       return;
     }
     if (typeof view === "object") {
-      if (view.qIndex > 0) {
-        setView({ chainIndex: view.chainIndex, qIndex: view.qIndex - 1 });
-      } else if (view.chainIndex > 0) {
+      if (view.qIndex === -1 && view.chainIndex === 0) {
+        setView("welcome");
+      } else if (view.qIndex === -1) {
         const prev = chains[view.chainIndex - 1];
         setView({ chainIndex: view.chainIndex - 1, qIndex: prev.questions.length - 1 });
+      } else if (view.qIndex === 0) {
+        setView({ chainIndex: view.chainIndex, qIndex: -1 });
       } else {
-        setView("welcome");
+        setView({ chainIndex: view.chainIndex, qIndex: view.qIndex - 1 });
       }
     }
   }
@@ -176,9 +180,9 @@ function App() {
 
   // ── User actions ──────────────────────────────────────────────────────────
 
-  function onStart()   { setAnswers({}); setReadOnly(false); setView({ chainIndex: 0, qIndex: 0 }); }
+  function onStart()   { setAnswers({}); setReadOnly(false); setView({ chainIndex: 0, qIndex: -1 }); }
   function onEdit()    { setReadOnly(false); setView({ chainIndex: 0, qIndex: 0 }); }
-  function onRetake()  { setAnswers({}); setReadOnly(false); setSavedVersion(null); setView({ chainIndex: 0, qIndex: 0 }); }
+  function onRetake()  { setAnswers({}); setReadOnly(false); setSavedVersion(null); setView({ chainIndex: 0, qIndex: -1 }); }
   function onViewOld() { setReadOnly(true); setView("results"); }
 
   function onRestart() {
@@ -229,7 +233,21 @@ function App() {
             <Welcome meta={setMeta} accent={accent} onStart={onStart} chains={chains} />
           )}
 
-          {typeof view === "object" && (
+          {typeof view === "object" && view.qIndex === -1 && (
+            <ChainIntroScreen
+              chain={chains[view.chainIndex]}
+              chains={chains}
+              chainIndex={view.chainIndex}
+              onNext={onNext}
+              onPrev={onPrev}
+              progressStyle={progressStyle}
+              accent={accent}
+              totalAnswered={totalAnswered}
+              totalQuestions={totalQuestions}
+            />
+          )}
+
+          {typeof view === "object" && view.qIndex >= 0 && (
             <QuestionScreen
               chain={chains[view.chainIndex]}
               chains={chains}

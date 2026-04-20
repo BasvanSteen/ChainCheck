@@ -44,26 +44,30 @@ function ChainProgress({ chains, currentIndex, questionsDone, totalQuestions, st
   }
 
   // ketting (default)
+  const activeChain = chains[currentIndex];
   return (
     <div className="cc-progress cc-progress--ketting">
-      <div className="cc-ketting-track" />
-      {chains.map((c, i) => {
-        const Icon = CHAIN_ICONS[c.id] || CHAIN_ICONS.doelgroep;
-        const state = i < currentIndex ? "done" : i === currentIndex ? "active" : "todo";
-        const tint = state === "active" ? accent
-          : state === "done" ? (CHAIN_COLORS[c.id] || accent)
-          : "#CBD5DB";
-        return (
-          <div key={c.id} className={`cc-klink cc-klink--${state}`}>
-            <div className="cc-klink-icon" style={{ color: tint }}>
-              <Icon size={26} color={tint} />
+      <div className="cc-ketting-active-label" style={{ color: accent }}>{activeChain?.title}</div>
+      <div className="cc-ketting-icons-row">
+        <div className="cc-ketting-track" />
+        {chains.map((c, i) => {
+          const Icon = CHAIN_ICONS[c.id] || CHAIN_ICONS.doelgroep;
+          const state = i < currentIndex ? "done" : i === currentIndex ? "active" : "todo";
+          const tint = state === "active" ? accent
+            : state === "done" ? (CHAIN_COLORS[c.id] || accent)
+            : "#CBD5DB";
+          return (
+            <div key={c.id} className={`cc-klink cc-klink--${state}`}>
+              <div className="cc-klink-icon" style={{ color: tint }}>
+                <Icon size={26} color={tint} />
+              </div>
+              <span className="cc-klink-label" style={state === "active" ? { color: accent, fontWeight: 700 } : undefined}>
+                {c.title}
+              </span>
             </div>
-            <span className="cc-klink-label" style={state === "active" ? { color: accent, fontWeight: 700 } : undefined}>
-              {c.title}
-            </span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
