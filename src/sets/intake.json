@@ -10,11 +10,11 @@
     "welcome": {
       "badge": "Winstgevende Website Zelfscan · gratis",
       "title": "Hoe winstgevend is jouw website?",
-      "lead": "Je website is een ketting van 6 schakels. Eén zwakke schakel kost je klanten. In ~5 minuten weet je welke dat is.",
+      "lead": "Je website bestaat uit 6 schakels. In ~5 minuten zie je waar je sterk staat — en waar de meeste winst te halen is.",
       "bullets": [
         "Een score per schakel — zie direct waar je sterk staat",
-        "Concrete aanbevelingen voor je zwakke plekken",
-        "Geen e-mail verplicht — gewoon een eerlijke spiegel"
+        "Concrete aanbevelingen voor je zwakste plekken",
+        "Resultaten direct naar je inbox"
       ],
       "timeEstimate": "12 vragen · ~4 min"
     },
@@ -31,23 +31,23 @@
       "lead": "Het bepalen van de juiste woorden waar jouw doelgroep op zoekt in Google en in AI-zoekmachines is het vertrekpunt.",
       "verdicts": {
         "strong": "Je doelgroep-schakel staat stevig. Je weet wie je klant is en hoe je ze bereikt — bouw hierop verder.",
-        "warn": "Je hebt een beeld van je doelgroep, maar het mist scherpte. Concretiseer je persona en zoektermen voor meer resultaat.",
-        "weak": "Dit is een zwakke schakel. Zonder duidelijke doelgroep spreek je niemand echt aan — dit is de basis van alles."
+        "warn": "Je hebt een beeld van je doelgroep, maar er is ruimte om het scherper te maken. Meer concreetheid levert hier direct meer resultaat op.",
+        "weak": "De doelgroep-schakel is een mooie plek om te beginnen. Wie je aanspreekt en hoe je ze bereikt, is de basis van alles."
       },
       "questions": [
         {
-          "q": "Weet jij precies welke 150 zoektermen & prompts jouw ideale klant gebruikt in Google & AI tools zoals Claude, Gemini en ChatGPT?",
+          "q": "Weet jij welke zoektermen en prompts jouw ideale klant gebruikt in Google en AI-tools zoals Claude, Gemini en ChatGPT?",
           "options": [
             {
               "label": "Ja, ik heb dit grondig onderzocht en pas mijn website hier continu op aan.",
               "score": 3
             },
             {
-              "label": "Een beetje. Ik heb er over nagedacht, maar ik heb niet echt een plan.",
+              "label": "Ik heb er over nagedacht, maar een concreet overzicht heb ik nog niet.",
               "score": 1
             },
             {
-              "label": "Nee, ik heb hier nog niet echt naar gekeken.",
+              "label": "Dit is iets waar ik nog niet mee bezig ben geweest.",
               "score": 0
             }
           ]
@@ -56,15 +56,15 @@
           "q": "Heb je jouw ideale klant scherp en weet je hoe je ze online kunt bereiken en wat ze nodig hebben om via jouw website klant bij je te worden?",
           "options": [
             {
-              "label": "Ja, ik test dit uitvoerig. Ik weet precies hoe ik relevante bezoekers krijg en hoe ik daar klanten van maak.",
+              "label": "Ja, ik weet precies wie mijn klant is, hoe ik ze bereik en wat ze over de streep trekt.",
               "score": 3
             },
             {
-              "label": "Globaal wel, maar nog vrij breed of vaag.",
+              "label": "Ik heb een globaal beeld, maar het is nog niet heel specifiek uitgewerkt.",
               "score": 1
             },
             {
-              "label": "Nee, dat is voor mij nog niet duidelijk.",
+              "label": "Dat is voor mij nog niet duidelijk.",
               "score": 0
             }
           ]
@@ -77,23 +77,23 @@
       "lead": "Goede pagina's leiden de bezoeker logisch naar een actie: een onweerstaanbaar aanbod.",
       "verdicts": {
         "strong": "Je aanbod-schakel staat stevig. Je pagina's converteren — focus nu op optimaliseren en schalen.",
-        "warn": "Je hebt pagina's, maar de flow en boodschap kunnen scherper. Kleine verbeteringen leveren hier direct meer klanten op.",
-        "weak": "Dit is een zwakke schakel. Zonder gerichte landingspagina's verlies je bezoekers voor ze actie ondernemen."
+        "warn": "Je hebt pagina's, maar de flow en boodschap kunnen scherper. Kleine aanpassingen leveren hier direct meer klanten op.",
+        "weak": "Gerichte landingspagina's zijn een van de snelste manieren om meer uit je bestaande bezoekers te halen — hier ligt veel potentieel."
       },
       "questions": [
         {
-          "q": "Heeft jouw website specifieke pagina's, om te scoren in Google of te adverteren, die bezoekers stap voor stap naar een concrete actie leiden?",
+          "q": "Heeft jouw website specifieke pagina's die bezoekers stap voor stap naar een concrete actie leiden?",
           "options": [
             {
-              "label": "Ja, ik heb meerdere specifieke pagina's met een duidelijke flow: probleem → oplossing → bewijs → actie.",
+              "label": "Ja, ik heb meerdere gerichte pagina's met een duidelijke opbouw en call-to-action.",
               "score": 3
             },
             {
-              "label": "Ik heb specifieke pagina's maar er komen weinig bezoekers op en de flow klopt nog niet.",
+              "label": "Ik heb specifieke pagina's, maar de opbouw en het bezoekersaantal kunnen beter.",
               "score": 1
             },
             {
-              "label": "Nee, er zijn geen gerichte pagina's om meer klanten en aanvragen uit mijn website te halen.",
+              "label": "Nee, daar heb ik nog geen gerichte pagina's voor.",
               "score": 0
             }
           ]
@@ -106,11 +106,11 @@
               "score": 3
             },
             {
-              "label": "Min of meer. Het staat er, maar misschien te vaag of te algemeen.",
+              "label": "Grotendeels wel, maar er is ruimte om het scherper te formuleren.",
               "score": 1
             },
             {
-              "label": "Nee, de boodschap is onduidelijk of te breed.",
+              "label": "Dat is nog een werkpunt — de boodschap is nu vrij breed.",
               "score": 0
             }
           ]
@@ -123,8 +123,8 @@
       "lead": "Eén pagina die scoort is een begin. Structurele vindbaarheid op meerdere zoektermen is het doel.",
       "verdicts": {
         "strong": "Je SEO-schakel staat stevig. Je groeit organisch — blijf publiceren en posities bewaken.",
-        "warn": "Je doet iets aan SEO, maar een consistent ritme en strategie ontbreken. Dat kost je posities.",
-        "weak": "Dit is een zwakke schakel. Zonder SEO ben je onzichtbaar voor mensen die actief zoeken naar wat jij biedt."
+        "warn": "Je doet iets aan SEO, maar een consistent ritme en strategie ontbreken. Dat is precies waar de meeste winst zit.",
+        "weak": "SEO is een van de krachtigste manieren om structureel gevonden te worden — hier liggen grote kansen voor je."
       },
       "questions": [
         {
@@ -135,11 +135,11 @@
               "score": 3
             },
             {
-              "label": "Op één of twee termen, maar niet consistent.",
+              "label": "Op één of twee termen, maar nog niet breed of consistent.",
               "score": 1
             },
             {
-              "label": "Nee, mijn website is nauwelijks vindbaar via Google.",
+              "label": "Mijn website is via Google nog weinig vindbaar.",
               "score": 0
             }
           ]
@@ -152,11 +152,11 @@
               "score": 3
             },
             {
-              "label": "Ik doe soms wat, maar een plan of ritme ontbreekt.",
+              "label": "Ik doe af en toe iets, maar een vast plan of ritme heb ik nog niet.",
               "score": 1
             },
             {
-              "label": "Nee, ik doe niets actief aan SEO.",
+              "label": "SEO staat nog niet actief op de agenda.",
               "score": 0
             }
           ]
@@ -170,22 +170,22 @@
       "verdicts": {
         "strong": "Je AI-schakel staat stevig. Je bent al aanwezig waar je doelgroep steeds vaker zoekt.",
         "warn": "Je weet dat AI belangrijk wordt, maar een structurele aanpak ontbreekt nog. Nu is het moment om voor te lopen.",
-        "weak": "Dit is een zwakke schakel. AI-gedreven zoekverkeer groeit snel — zonder optimalisatie mis je een snel groeiend kanaal."
+        "weak": "AI-gedreven zoekverkeer groeit snel — dit is een kanaal waar nog weinig bedrijven actief op inzetten. Vroeg beginnen loont."
       },
       "questions": [
         {
           "q": "Wordt jouw bedrijf gevonden als mensen vragen stellen aan ChatGPT of andere AI-tools?",
           "options": [
             {
-              "label": "Ja, ik weet dat ik daar zichtbaar ben bij alle relevante vragen.",
+              "label": "Ja, ik weet dat ik daar zichtbaar ben bij relevante vragen.",
               "score": 3
             },
             {
-              "label": "Ik heb er nog niet echt op getest of gecheckt, dus ik weet het niet.",
+              "label": "Ik heb dat nog niet gecheckt of getest.",
               "score": 1
             },
             {
-              "label": "Nee, ik doe hier helemaal niets mee.",
+              "label": "Nee, dit is iets waar ik nog niet mee bezig ben.",
               "score": 0
             }
           ]
@@ -198,11 +198,11 @@
               "score": 3
             },
             {
-              "label": "Ik weet dat het belangrijk wordt, maar heb nog geen systeem.",
+              "label": "Ik weet dat het belangrijk wordt, maar heb nog geen aanpak.",
               "score": 1
             },
             {
-              "label": "Nee, dit staat niet op mijn radar.",
+              "label": "Dit staat nog niet op mijn radar.",
               "score": 0
             }
           ]
@@ -215,8 +215,8 @@
       "lead": "Als de basis van jouw website staat, kun je gaan opschalen met betaalde advertenties.",
       "verdicts": {
         "strong": "Je ads-schakel staat stevig. Je adverteert winstgevend — focus op verder opschalen.",
-        "warn": "Je hebt geëxperimenteerd met ads maar het resultaat is wisselend. Een sterkere basis maakt het verschil.",
-        "weak": "Dit is een zwakke schakel. Zonder winstgevende ads mis je een directe manier om klanten te schalen."
+        "warn": "Je hebt geëxperimenteerd met ads maar het resultaat is wisselend. Een sterkere basis maakt hier het verschil.",
+        "weak": "Betaalde advertenties zijn een directe manier om bezoekers te schalen zodra de basis staat — goed om hier naar te kijken."
       },
       "questions": [
         {
@@ -227,11 +227,11 @@
               "score": 3
             },
             {
-              "label": "Ik heb het geprobeerd, maar met wisselend resultaat.",
+              "label": "Ik heb het geprobeerd, maar het resultaat was wisselend.",
               "score": 1
             },
             {
-              "label": "Nee, ik gebruik geen betaalde advertenties.",
+              "label": "Nee, ik kies er bewust voor om hier nog niet mee te beginnen.",
               "score": 0
             }
           ]
@@ -244,11 +244,11 @@
               "score": 3
             },
             {
-              "label": "Deels — er zijn nog zwakke schakels die versterkt moeten worden.",
+              "label": "Deels — er zijn nog punten die versterkt kunnen worden.",
               "score": 1
             },
             {
-              "label": "Nee, de basis staat nog niet sterk genoeg.",
+              "label": "De basis is er nog niet helemaal klaar voor.",
               "score": 0
             }
           ]
@@ -261,23 +261,23 @@
       "lead": "Een bezoeker beslist in 3 tot 7 seconden of hij blijft of weggaat.",
       "verdicts": {
         "strong": "Je conversie-schakel staat stevig. Je stuurt op data en optimaliseert continu — dat is het verschil.",
-        "warn": "Je meet iets, maar je gebruikt die data niet consequent om te verbeteren. Hier laat je klanten liggen.",
-        "weak": "Dit is een zwakke schakel. Zonder meten en testen is je website een gok in plaats van een systeem."
+        "warn": "Je meet iets, maar je gebruikt die data nog niet consequent. Hier zit veel onbenut potentieel.",
+        "weak": "Met inzicht in bezoekersgedrag kun je je website stap voor stap veel effectiever maken — dit is een mooie volgende stap."
       },
       "questions": [
         {
           "q": "Meet je actief wat bezoekers doen op jouw website?",
           "options": [
             {
-              "label": "Ja, ik gebruik analytics tools en weet precies waar bezoekers afhaken.",
+              "label": "Ja, ik gebruik analytics en weet waar bezoekers afhaken.",
               "score": 3
             },
             {
-              "label": "Ik heb analytics tools, maar kijk er zelden naar.",
+              "label": "Ik heb analytics staan, maar kijk er niet regelmatig naar.",
               "score": 1
             },
             {
-              "label": "Nee, ik meet niets of weet niet hoe.",
+              "label": "Nee, ik meet dit nog niet actief.",
               "score": 0
             }
           ]
@@ -290,11 +290,11 @@
               "score": 3
             },
             {
-              "label": "Soms pas ik dingen aan, maar op gevoel, niet op basis van data.",
+              "label": "Ik pas soms dingen aan, vooral op gevoel.",
               "score": 1
             },
             {
-              "label": "Nee, mijn website staat er en ik pas weinig aan.",
+              "label": "Mijn website staat er — ik pas er weinig aan.",
               "score": 0
             }
           ]
@@ -323,7 +323,7 @@
       },
       {
         "id": "email",
-        "label": "Wat is jouw e-mailadres voor het versturen van de resultaten?",
+        "label": "Wat is jouw e-mailadres? We sturen de resultaten daar naartoe.",
         "type": "email"
       }
     ]
