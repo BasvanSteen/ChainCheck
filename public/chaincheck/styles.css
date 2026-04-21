@@ -1,5 +1,7 @@
 /* ChainCheck — app styles */
 
+.cc-app *, .cc-app *::before, .cc-app *::after { box-sizing: border-box; }
+
 :root {
   --cc-navy:  #002E48;
   --cc-pink:  #EE3D96;
@@ -348,6 +350,24 @@
 .cc-focus-title { font-weight: 700; font-size: 16px; }
 .cc-focus-sub { font-size: 13px; color: var(--cc-muted); }
 
+/* ── Strategy screen ─────────────────────────────────── */
+.cc-strategy-body { padding-top: 4px; }
+.cc-strategy-fields { display: flex; flex-direction: column; gap: 14px; margin-top: 24px; }
+.cc-field { display: flex; flex-direction: column; gap: 6px; }
+.cc-field-label {
+  font-size: 14px; font-weight: 600; color: var(--cc-navy);
+  display: flex; align-items: center; gap: 4px;
+}
+.cc-field-required { font-size: 16px; line-height: 1; }
+.cc-field-input {
+  padding: 12px 14px;
+  border: 2px solid var(--cc-line); border-radius: 10px;
+  font: inherit; font-size: 15px; color: var(--cc-navy);
+  background: #fff; outline: none;
+  transition: border-color .15s;
+}
+.cc-field-input:focus { border-color: var(--cc-navy); }
+
 .cc-cta {
   background: var(--cc-navy); color: #fff; border-radius: 20px; padding: 24px;
   display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 20px;
@@ -429,9 +449,10 @@
     margin-bottom: 6px;
   }
   .cc-ketting-icons-row { align-items: center; }
+  .cc-klink { min-width: 0; }
   .cc-klink-label { display: none; }
-  .cc-klink-icon { width: 30px; height: 30px; }
-  .cc-ketting-track { left: 22px; right: 22px; top: 15px; }
+  .cc-klink-icon { width: 26px; height: 26px; }
+  .cc-ketting-track { left: 18px; right: 18px; top: 13px; }
 }
 
 /* ── Mobile ──────────────────────────────────────────── */
@@ -440,7 +461,14 @@
   .cc-window { padding: 20px; border-radius: 16px; }
   .cc-topbar { padding-bottom: 14px; }
   .cc-stage::after { display: none; }
-.cc-results-hero { grid-template-columns: 1fr; }
+  .cc-results-hero { grid-template-columns: 1fr; }
+  .cc-results-chain {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 14px;
+  }
+  .cc-result-link { flex: unset; min-width: unset; }
   .cc-cards-grid { grid-template-columns: 1fr; }
   .cc-focus-list { grid-template-columns: 1fr; }
   .cc-cta { grid-template-columns: 1fr; }

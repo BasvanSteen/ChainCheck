@@ -1,6 +1,5 @@
 import questionnaires from './sets/index.js';
 
-// Build lookup maps for fast access by id and by slug
 const byId   = Object.fromEntries(questionnaires.map(q => [q.id,   q]));
 const bySlug = Object.fromEntries(questionnaires.map(q => [q.slug, q]));
 
@@ -30,7 +29,6 @@ function corsHeaders() {
   });
 }
 
-// Serve the SPA index.html for any slug route
 async function serveSPA(env, request) {
   const url = new URL(request.url);
   url.pathname = '/index.html';
@@ -40,99 +38,74 @@ async function serveSPA(env, request) {
 // ── API handlers ──────────────────────────────────────────────────────────────
 
 function handleGetSets() {
-  const list = questionnaires.map(q => ({
-    id: q.id,
-    slug: q.slug,
-    name: q.name,
-    version: q.version,
-    tag: q.tag,
-  }));
-  return json(list);
+  return json(questionnaires.map(q => ({
+    id: q.id, slug: q.slug, name: q.name, version: q.version, tag: q.tag,
+  })));
 }
 
 function handleGetSet(identifier) {
   const set = findSet(identifier);
   if (!set) return json({ error: 'Not found' }, 404);
-  // Strip internal fields before sending to frontend
   const { pipelineId, calendly, ...rest } = set;
   return json(rest);
 }
 
-async function handleSaveResponse(request, env) {
-  if (!env.RESPONSES) return json({ error: 'Storage not configured' }, 501);
-
-  let body;
-  try { body = await request.json(); }
-  catch { return json({ error: 'Invalid JSON' }, 400); }
-
-  const { slug, version, answers } = body;
-  if (!slug || !version || !answers) {
-    return json({ error: 'Missing required fields: slug, version, answers' }, 400);
-  }
+// Generates a responseId for correlation — no storage
+function handleCreateResponse(body) {
+  const { slug, version } = body || {};
+  if (!slug || !version) return json({ error: 'Missing required fields: slug, version' }, 400);
   if (!findSet(slug)) return json({ error: `Unknown slug: ${slug}` }, 400);
-
-  const id = crypto.randomUUID();
-  await env.RESPONSES.put(`response:${id}`, JSON.stringify({
-    id, slug, version, answers,
-    createdAt: new Date().toISOString(),
-    updatedAt: null,
-  }), { expirationTtl: 60 * 60 * 24 * 365 });
-
-  return json({ id }, 201);
+  return json({ id: crypto.randomUUID() }, 201);
 }
 
-async function handleGetResponse(id, env) {
-  if (!env.RESPONSES) return json({ error: 'Storage not configured' }, 501);
-  const raw = await env.RESPONSES.get(`response:${id}`);
-  if (!raw) return json({ error: 'Not found' }, 404);
-  return json(JSON.parse(raw));
-}
+// Compute per-chain scores from raw answer indices
+function computeResult(set, answers) {
+  let totalScore = 0;
+  let totalMax   = 0;
 
-async function handleUpdateResponse(id, request, env) {
-  if (!env.RESPONSES) return json({ error: 'Storage not configured' }, 501);
-  const raw = await env.RESPONSES.get(`response:${id}`);
-  if (!raw) return json({ error: 'Not found' }, 404);
-
-  let body;
-  try { body = await request.json(); }
-  catch { return json({ error: 'Invalid JSON' }, 400); }
-
-  const existing = JSON.parse(raw);
-  const updated = {
-    ...existing,
-    answers: body.answers ?? existing.answers,
-    version: body.version ?? existing.version,
-    updatedAt: new Date().toISOString(),
-  };
-  await env.RESPONSES.put(`response:${id}`, JSON.stringify(updated), {
-    expirationTtl: 60 * 60 * 24 * 365,
+  const chains = set.chains.map(chain => {
+    const picked = answers[chain.id] || [];
+    const score  = chain.questions.reduce((sum, q, i) => sum + (q.options[picked[i]]?.score ?? 0), 0);
+    const max    = chain.questions.length * 3;
+    const pct    = max > 0 ? score / max : 0;
+    const verdict = pct >= 0.75 ? 'strong' : pct >= 0.40 ? 'warn' : 'weak';
+    totalScore += score;
+    totalMax   += max;
+    return { id: chain.id, title: chain.title, score, max, pct: Math.round(pct * 100) / 100, verdict };
   });
-  return json(updated);
+
+  const totalPct = totalMax > 0 ? totalScore / totalMax : 0;
+  const tiers = (set.meta?.analysis || []).slice().sort((a, b) => (a.maxScore ?? Infinity) - (b.maxScore ?? Infinity));
+  const tier  = tiers.find(t => t.maxScore == null || totalScore <= t.maxScore) || tiers[tiers.length - 1];
+
+  return { totalScore, totalMax, totalPct: Math.round(totalPct * 100) / 100, level: tier?.level || '', chains };
 }
 
-// Submit handler — triggers external API (CRM pipeline, Calendly, etc.)
-// env.EXTERNAL_API_URL comes from .dev.vars locally, [vars] in production
+// Submit — sends full payload to external API
 async function handleSubmit(request, env) {
   let body;
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  const { responseId, slug } = body;
-  if (!responseId || !slug) {
-    return json({ error: 'Missing required fields: responseId, slug' }, 400);
-  }
+  const { slug, responseId, strategy, answers, version } = body;
+  if (!slug) return json({ error: 'Missing required field: slug' }, 400);
+
+  console.log('[submit] slug:', slug, '| responseId:', responseId || '(none)');
 
   const set = findSet(slug);
   if (!set) return json({ error: `Unknown slug: ${slug}` }, 400);
 
+  const result = computeResult(set, answers || {});
   const externalUrl = env.EXTERNAL_API_URL;
+  let customerId = null;
 
   if (externalUrl) {
     try {
-      await fetch(`${externalUrl}/api/chaincheck/submit`, {
+      const extRes = await fetch(`${externalUrl}/api-internal/chaincheck/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Internal-Tool': 'chaincheck',
           ...(env.EXTERNAL_API_KEY ? { 'Authorization': `Bearer ${env.EXTERNAL_API_KEY}` } : {}),
         },
         body: JSON.stringify({
@@ -141,29 +114,65 @@ async function handleSubmit(request, env) {
           slug: set.slug,
           name: set.name,
           tag: set.tag,
+          version,
+          strategy,
+          result,
+          submittedAt: new Date().toISOString(),
         }),
       });
+      if (extRes.ok) {
+        const extData = await extRes.json();
+        customerId = extData.customerId ?? null;
+        console.log('[submit] external API ok | customerId:', customerId);
+      } else {
+        const errText = await extRes.text().catch(() => '(no body)');
+        console.error('[submit] external API error | status:', extRes.status, '| body:', errText);
+      }
     } catch (e) {
-      // Log but don't block — returning calendly link is more important
-      console.error('External API call failed:', e.message);
+      console.error('[submit] external API unreachable:', e.message);
     }
   }
 
-  return json({ ok: true, calendly: set.calendly });
+  return json({ ok: true, calendly: set.calendly, customerId });
+}
+
+// Customer proxy — fetches customer profile from external API by id or email
+async function handleGetCustomer(request, env) {
+  const params = new URL(request.url).searchParams;
+  const lookup = params.get('id') || params.get('email');
+  if (!lookup) return json({ error: 'Missing id or email parameter' }, 400);
+
+  const externalUrl = env.EXTERNAL_API_URL;
+  if (!externalUrl) return json({ error: 'External API not configured' }, 501);
+
+  try {
+    const res = await fetch(
+      `${externalUrl}/api-internal/chaincheck/customers/${encodeURIComponent(lookup)}`,
+      {
+        headers: {
+          'X-Internal-Tool': 'chaincheck',
+          ...(env.EXTERNAL_API_KEY ? { 'Authorization': `Bearer ${env.EXTERNAL_API_KEY}` } : {}),
+        },
+      }
+    );
+    if (!res.ok) return json({ error: 'Not found' }, res.status);
+    return json(await res.json());
+  } catch (e) {
+    return json({ error: 'External API unavailable' }, 502);
+  }
 }
 
 // ── Main entry ────────────────────────────────────────────────────────────────
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
+    const url  = new URL(request.url);
     const path = url.pathname;
 
     if (request.method === 'OPTIONS') return corsHeaders();
 
-    // ── API routes ────────────────────────────────────────────────────────────
     if (path.startsWith('/api/')) {
-      const route = path.slice(4); // strip '/api'
+      const route = path.slice(4);
 
       if (route === '/sets' && request.method === 'GET')
         return handleGetSets();
@@ -172,30 +181,23 @@ export default {
       if (setMatch && request.method === 'GET')
         return handleGetSet(setMatch[1]);
 
-      if (route === '/responses' && request.method === 'POST')
-        return handleSaveResponse(request, env);
-
-      const respMatch = route.match(/^\/responses\/([0-9a-f-]{36})$/i);
-      if (respMatch) {
-        if (request.method === 'GET') return handleGetResponse(respMatch[1], env);
-        if (request.method === 'PUT') return handleUpdateResponse(respMatch[1], request, env);
+      if (route === '/responses' && request.method === 'POST') {
+        let body;
+        try { body = await request.json(); } catch { body = {}; }
+        return handleCreateResponse(body);
       }
 
       if (route === '/submit' && request.method === 'POST')
         return handleSubmit(request, env);
 
+      if (route === '/customer' && request.method === 'GET')
+        return handleGetCustomer(request, env);
+
       return json({ error: 'Not found' }, 404);
     }
 
-    // ── Static assets (JS, CSS, fonts, images) ────────────────────────────────
-    // Pass through requests for files with extensions to the asset handler
-    if (path.includes('.')) {
-      return env.ASSETS.fetch(request);
-    }
+    if (path.includes('.')) return env.ASSETS.fetch(request);
 
-    // ── Slug routes → serve SPA ───────────────────────────────────────────────
-    // e.g. /intake, /marketing-check → serve index.html
-    // The frontend reads the slug from window.location.pathname
     return serveSPA(env, request);
   },
 };

@@ -1,5 +1,5 @@
 // ChainCheck — App root
-/* global React, ReactDOM, CHAIN_ICONS, CHAIN_COLORS, Welcome, ChainIntroScreen, QuestionScreen, Results, VersionMismatch */
+/* global React, ReactDOM, CHAIN_ICONS, CHAIN_COLORS, Welcome, ChainIntroScreen, QuestionScreen, StrategyScreen, Results, VersionMismatch */
 
 const { useState, useEffect } = React;
 
@@ -16,9 +16,9 @@ function chainVerdict(chain, score) {
 
 // ── URL helpers ───────────────────────────────────────────────────────────────
 
-function getSlug() {
-  const path = window.location.pathname.replace(/^\//, "").replace(/\/$/, "");
-  return path || "default";
+function parsePath() {
+  const parts = window.location.pathname.replace(/^\//, "").replace(/\/$/, "").split("/");
+  return { slug: parts[0] || "default", customerId: parts[1] || null };
 }
 
 function getParams() {
@@ -52,6 +52,13 @@ function App() {
   // Answers: { [chainId]: number[] }
   const [answers, setAnswers] = useState({});
 
+  // Strategy form values
+  const [strategyData, setStrategyData] = useState({});
+
+  // Customer profile from external API (loaded when email is known)
+  const [customerData, setCustomerData] = useState(null);
+  const [customerId, setCustomerId] = useState(null);
+
   // Response tracking
   const [responseId, setResponseId] = useState(null);
   const [savedVersion, setSavedVersion] = useState(null);
@@ -64,9 +71,10 @@ function App() {
   // ── Load question set + optional saved response on mount ──────────────────
 
   useEffect(() => {
-    const slug = getSlug();
+    const { slug, customerId: urlCustomerId } = parsePath();
     const respId = getParams().get("response");
     setCurrentSlug(slug);
+    if (urlCustomerId) setCustomerId(urlCustomerId);
 
     const fetchSet = fetch(`/api/sets/${slug}`).then(r => {
       if (!r.ok) throw new Error(`Vragenlijst "${slug}" niet gevonden`);
@@ -77,17 +85,35 @@ function App() {
       ? fetch(`/api/responses/${respId}`).then(r => r.ok ? r.json() : null).catch(() => null)
       : Promise.resolve(null);
 
-    Promise.all([fetchSet, fetchResp])
-      .then(([set, resp]) => {
+    const fetchCustomer = urlCustomerId
+      ? fetch(`/api/customer?id=${encodeURIComponent(urlCustomerId)}`).then(r => r.ok ? r.json() : null).catch(() => null)
+      : Promise.resolve(null);
+
+    Promise.all([fetchSet, fetchResp, fetchCustomer])
+      .then(([set, resp, customer]) => {
         setChains(set.chains);
-        setSetMeta({ id: set.id, slug: set.slug, version: set.version, ...set.meta });
+        setSetMeta({ id: set.id, slug: set.slug, version: set.version, ...set.meta, strategy: set.strategy });
+
+        if (customer) setCustomerData(customer);
 
         if (resp && !resp.error) {
           setResponseId(resp.id);
           setSavedVersion(resp.version);
           setAnswers(resp.answers || {});
+          if (resp.strategy) setStrategyData(resp.strategy);
           setView(resp.version !== set.version ? "version-mismatch" : "results");
           if (resp.version === set.version) setReadOnly(true);
+
+          // Fetch customer profile by email as fallback if no ID in URL
+          if (!urlCustomerId) {
+            const email = resp.strategy?.email;
+            if (email) {
+              fetch(`/api/customer?email=${encodeURIComponent(email)}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(c => { if (c) setCustomerData(c); })
+                .catch(() => {});
+            }
+          }
         }
 
         setLoadState("ready");
@@ -126,11 +152,16 @@ function App() {
     } else if (view.chainIndex + 1 < chains.length) {
       setView({ chainIndex: view.chainIndex + 1, qIndex: -1 });
     } else {
-      saveAndShowResults();
+      setView("strategy");
     }
   }
 
   function onPrev() {
+    if (view === "strategy") {
+      const last = chains.length - 1;
+      setView({ chainIndex: last, qIndex: chains[last].questions.length - 1 });
+      return;
+    }
     if (view === "results") {
       const last = chains.length - 1;
       setView({ chainIndex: last, qIndex: chains[last].questions.length - 1 });
@@ -152,27 +183,21 @@ function App() {
 
   // ── Save ──────────────────────────────────────────────────────────────────
 
-  async function saveAndShowResults() {
+  async function saveAndShowResults(strategy = strategyData) {
+    setStrategyData(strategy);
     setSaving(true);
     try {
-      const isUpdate = !!responseId;
-      const url    = isUpdate ? `/api/responses/${responseId}` : "/api/responses";
-      const method = isUpdate ? "PUT" : "POST";
-
-      const res  = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: currentSlug, version: setMeta.version, answers }),
-      });
-      const data = await res.json();
-      const id   = data.id || responseId;
-
-      if (id) {
-        setResponseId(id);
-        setParam("response", id);
+      if (!responseId) {
+        const res  = await fetch("/api/responses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: currentSlug, version: setMeta.version }),
+        });
+        const data = await res.json();
+        if (data.id) setResponseId(data.id);
       }
     } catch (e) {
-      console.error("Save failed:", e);
+      console.error("Response ID generation failed:", e);
     }
     setSaving(false);
     setView("results");
@@ -266,6 +291,18 @@ function App() {
             />
           )}
 
+          {view === "strategy" && setMeta.strategy && (
+            <StrategyScreen
+              strategy={setMeta.strategy}
+              initialValues={strategyData}
+              customerData={customerData}
+              onSubmit={saveAndShowResults}
+              onPrev={onPrev}
+              accent={accent}
+              saving={saving}
+            />
+          )}
+
           {view === "results" && (
             <Results
               answers={answers}
@@ -278,6 +315,12 @@ function App() {
               onEdit={readOnly ? onEdit : null}
               responseId={responseId}
               readOnly={readOnly}
+              strategy={strategyData}
+              onCustomerId={(cid) => {
+                setCustomerId(cid);
+                const qs = getParams().toString();
+                window.history.replaceState({}, "", `/${currentSlug}/${cid}${qs ? "?" + qs : ""}`);
+              }}
             />
           )}
 

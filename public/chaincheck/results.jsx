@@ -4,37 +4,25 @@
 const { useState } = React;
 
 function toneColor(tone) {
-  return tone === "good" ? "#00A84F" : tone === "warn" ? "#FF8C00" : "#EE3D96";
+  return tone === "good" ? "#16A34A" : tone === "warn" ? "#EA580C" : "#DC2626";
 }
 
 function toneLabel(tone) {
   return tone === "good" ? "Sterk" : tone === "warn" ? "Aandacht" : "Zwakke schakel";
 }
 
-function buildAnalysis(perChain, totalPct) {
-  const weak   = perChain.filter(p => p.verdict.tone === "weak");
-  const warn   = perChain.filter(p => p.verdict.tone === "warn");
-  const strong = perChain.filter(p => p.verdict.tone === "good");
+function buildAnalysis(analysisConfig, totalScore, strategy) {
+  const from = strategy?.currentClients;
+  const to   = strategy?.targetClients;
+  const grow = from && to ? ` van ${from} klanten naar ${to} klanten` : "";
 
-  if (totalPct >= 0.75) {
-    return {
-      level: "Sterke ketting",
-      headline: "Je fundament staat.",
-      body: `${strong.length} van de ${perChain.length} schakels zijn op orde. De winst zit nu in finetunen: testen, meten en scherper maken waar het al werkt${weak.length ? `, met extra aandacht voor ${weak.map(p => p.chain.title).join(" en ")}` : ""}.`,
-    };
-  }
-  if (totalPct >= 0.4) {
-    const names = [...weak, ...warn].slice(0, 2).map(p => p.chain.title).join(" en ");
-    return {
-      level: "Onvolledige ketting",
-      headline: "Je hebt een basis, maar een paar schakels hangen scheef.",
-      body: `Vooral ${names} houden je tegen. Een ketting is zo sterk als z'n zwakste schakel — fix die twee eerst en je hele funnel trekt mee.`,
-    };
-  }
+  const tiers = (analysisConfig || []).slice().sort((a, b) => (a.maxScore ?? Infinity) - (b.maxScore ?? Infinity));
+  const tier  = tiers.find(t => t.maxScore == null || totalScore <= t.maxScore) || tiers[tiers.length - 1] || {};
+
   return {
-    level: "Broze ketting",
-    headline: "Je hebt werk te doen — maar dat is goed nieuws.",
-    body: `${weak.length} schakels zijn nog zwak. Dat betekent dat je met relatief weinig moeite grote stappen kunt zetten. Begin bij één schakel, niet bij alles tegelijk.`,
+    level:    tier.level    || "",
+    headline: tier.headline || "",
+    body:     (tier.body    || "").replace("{grow}", grow),
   };
 }
 
@@ -82,7 +70,7 @@ function ScoreDial({ value, accent }) {
   );
 }
 
-function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart, onEdit, responseId, readOnly }) {
+function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart, onEdit, responseId, readOnly, strategy, onCustomerId }) {
   const [calendly, setCalendly] = React.useState(null);
 
   React.useEffect(() => {
@@ -90,10 +78,13 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ responseId: responseId || '', slug }),
+      body: JSON.stringify({ responseId: responseId || undefined, slug, strategy, answers, version: meta?.version }),
     })
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.calendly) setCalendly(d.calendly); })
+      .then(d => {
+        if (d?.calendly) setCalendly(d.calendly);
+        if (d?.customerId && onCustomerId) onCustomerId(d.customerId);
+      })
       .catch(() => {});
   }, [slug, responseId]);
   const perChain = chains.map((c) => {
@@ -110,7 +101,7 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
   const total = perChain.reduce((a, b) => a + b.score, 0);
   const totalMax = perChain.reduce((a, b) => a + b.max, 0);
   const totalPct = total / totalMax;
-  const analysis = buildAnalysis(perChain, totalPct);
+  const analysis = buildAnalysis(meta?.analysis, total, strategy);
   const weakest = [...perChain].sort((a, b) => a.pct - b.pct).slice(0, 2);
   const cta = meta?.cta || {};
 

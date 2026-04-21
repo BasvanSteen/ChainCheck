@@ -167,8 +167,63 @@ function VersionMismatch({ savedVersion, currentVersion, accent, onViewOld, onRe
   );
 }
 
+function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPrev, accent, saving }) {
+  const prefill = React.useMemo(() => ({
+    ...initialValues,
+    ...(customerData ? {
+      email:     customerData.email          || initialValues?.email     || "",
+      firstName: customerData.firstName      || initialValues?.firstName || "",
+      lastName:  customerData.lastName       || initialValues?.lastName  || "",
+    } : {}),
+  }), []);
+
+  const [values, setValues] = React.useState(prefill);
+  const emailField = strategy.fields.find(f => f.type === "email");
+  const canSubmit = emailField ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values[emailField.id] || "") : true;
+
+  function set(id, val) { setValues(v => ({ ...v, [id]: val })); }
+
+  return (
+    <div className="cc-screen cc-strategy">
+      <div className="cc-strategy-body">
+        <h2 className="cc-chain-title" style={{ color: accent }}>{strategy.title}</h2>
+        <p className="cc-chain-lead">{strategy.lead}</p>
+
+        <div className="cc-strategy-fields">
+          {strategy.fields.map(f => (
+            <div key={f.id} className="cc-field">
+              <label className="cc-field-label">
+                {f.label}
+                {f.required && <span className="cc-field-required" style={{ color: accent }}>*</span>}
+              </label>
+              <input
+                className="cc-field-input"
+                type={f.type === "number" ? "number" : f.type === "email" ? "email" : "text"}
+                value={values[f.id] || ""}
+                onChange={e => set(f.id, e.target.value)}
+                placeholder={f.type === "email" ? "jouw@email.nl" : f.type === "number" ? "0" : ""}
+                min={f.type === "number" ? 0 : undefined}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="cc-nav">
+        <button className="cc-nav-back" onClick={onPrev} aria-label="Vorige">
+          <IconArrowLeft size={14} /> <span>Vorige</span>
+        </button>
+        <CCButton onClick={() => onSubmit(values)} accent={accent} disabled={!canSubmit || saving} size="sm">
+          {saving ? "Opslaan…" : "Toon resultaat"}
+        </CCButton>
+      </div>
+    </div>
+  );
+}
+
 window.CCButton = CCButton;
 window.Welcome = Welcome;
 window.ChainIntroScreen = ChainIntroScreen;
 window.QuestionScreen = QuestionScreen;
+window.StrategyScreen = StrategyScreen;
 window.VersionMismatch = VersionMismatch;

@@ -22,7 +22,26 @@
       "heading": "Even praktisch meekijken?",
       "body": "Je staat er niet alleen voor. Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen.",
       "buttonLabel": "Plan een call"
-    }
+    },
+    "analysis": [
+      {
+        "maxScore": 7,
+        "level": "Oei.. veel werk aan de winkel",
+        "headline": "Je website laat heel veel omzet liggen.",
+        "body": "En dat terwijl je wilt groeien{grow}. Het goede nieuws: de schakels zijn te leren. Begin bij het fundament: doelgroep, SEO, AI en landingspagina's."
+      },
+      {
+        "maxScore": 15,
+        "level": "Belangrijke schakels ontbreken",
+        "headline": "Je hebt een basis, maar een paar belangrijke schakels ontbreken of zijn zwak.",
+        "body": "Het wordt moeilijk om te groeien{grow} zonder het versterken van de ketting. Versterk de zwakke schakels eerst om de omzetlekken in jouw website te dichten."
+      },
+      {
+        "level": "Jouw website heeft een stevige basis.",
+        "headline": "Jouw website heeft al een sterk systeem.",
+        "body": "Gebruik de uitslag om de laatste schakels te finaliseren en je groei te versnellen{grow}."
+      }
+    ]
   },
   "chains": [
     {
@@ -303,29 +322,15 @@
     }
   ],
   "strategy": {
-    "title": "Winstgevende website: online marketing strategie",
-    "lead": "Waar wil je over 6 tot 12 maanden staan?",
+    "title": "Bijna klaar — nog één stap",
+    "lead": "We sturen je de resultaten toe en vertellen je precies waar de meeste winst voor jouw website zit.",
     "fields": [
-      {
-        "id": "orderValue",
-        "label": "Wat is de gemiddelde order-/bestelwaarde van jouw gemiddelde klant?",
-        "type": "number"
-      },
-      {
-        "id": "currentClients",
-        "label": "Hoeveel klanten heb je nu gemiddeld per maand?",
-        "type": "number"
-      },
-      {
-        "id": "targetClients",
-        "label": "Naar hoeveel klanten per maand wil je de komende 6 tot 12 maanden toe groeien?",
-        "type": "number"
-      },
-      {
-        "id": "email",
-        "label": "Wat is jouw e-mailadres? We sturen de resultaten daar naartoe.",
-        "type": "email"
-      }
+      { "id": "firstName",      "label": "Voornaam",                                            "type": "text",   "required": false },
+      { "id": "lastName",       "label": "Achternaam",                                          "type": "text",   "required": false },
+      { "id": "email",          "label": "E-mailadres",                                         "type": "email",  "required": true  },
+      { "id": "orderValue",     "label": "Gemiddelde orderwaarde per klant (€)",                "type": "number", "required": false },
+      { "id": "currentClients", "label": "Huidig aantal klanten per maand",                     "type": "number", "required": false },
+      { "id": "targetClients",  "label": "Gewenst aantal klanten per maand (over 6–12 maanden)","type": "number", "required": false }
     ]
   }
 }
