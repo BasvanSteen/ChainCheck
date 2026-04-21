@@ -46,7 +46,7 @@ function handleGetSets() {
 function handleGetSet(identifier) {
   const set = findSet(identifier);
   if (!set) return json({ error: 'Not found' }, 404);
-  const { pipelineId, calendly, ...rest } = set;
+  const { pipelineId, groupId, calendly, ...rest } = set;
   return json(rest);
 }
 
@@ -71,7 +71,11 @@ function computeResult(set, answers) {
     const verdict = pct >= 0.75 ? 'strong' : pct >= 0.40 ? 'warn' : 'weak';
     totalScore += score;
     totalMax   += max;
-    return { id: chain.id, title: chain.title, score, max, pct: Math.round(pct * 100) / 100, verdict };
+    const questions = chain.questions.map((q, i) => {
+      const opt = q.options[picked[i]];
+      return { q: q.q, answer: opt?.label ?? null, score: opt?.score ?? null };
+    });
+    return { id: chain.id, title: chain.title, score, max, pct: Math.round(pct * 100) / 100, verdict, questions };
   });
 
   const totalPct = totalMax > 0 ? totalScore / totalMax : 0;
@@ -101,7 +105,7 @@ async function handleSubmit(request, env) {
 
   if (externalUrl) {
     try {
-      const extRes = await fetch(`${externalUrl}/api-internal/chaincheck/submit`, {
+      const extRes = await fetch(`${externalUrl}/api-internal/questionnaire/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,25 +115,30 @@ async function handleSubmit(request, env) {
         body: JSON.stringify({
           responseId,
           pipelineId: set.pipelineId,
+          groupId: set.groupId,
           slug: set.slug,
           name: set.name,
           tag: set.tag,
           version,
           strategy,
+          answers,
           result,
           submittedAt: new Date().toISOString(),
         }),
       });
       if (extRes.ok) {
         const extData = await extRes.json();
-        customerId = extData.customerId ?? null;
-        console.log('[submit] external API ok | customerId:', customerId);
+        console.log('[submit] external API full response:', JSON.stringify(extData));
+        customerId = extData.customerTrackingId ?? extData.customerId ?? null;
       } else {
         const errText = await extRes.text().catch(() => '(no body)');
         console.error('[submit] external API error | status:', extRes.status, '| body:', errText);
       }
     } catch (e) {
       console.error('[submit] external API unreachable:', e.message);
+      console.error('[submit] url attempted:', `${externalUrl}/api-internal/chaincheck/submit`);
+      console.error('[submit] error name:', e.name);
+      console.error('[submit] error cause:', e.cause ?? '(none)');
     }
   }
 
@@ -147,7 +156,7 @@ async function handleGetCustomer(request, env) {
 
   try {
     const res = await fetch(
-      `${externalUrl}/api-internal/chaincheck/customers/${encodeURIComponent(lookup)}`,
+      `${externalUrl}/api-internal/questionnaire/customers/${encodeURIComponent(lookup)}`,
       {
         headers: {
           'X-Internal-Tool': 'chaincheck',

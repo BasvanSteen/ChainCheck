@@ -1,10 +1,11 @@
 {
   "id": "winstgevende-website",
-  "slug": "intake",
+  "slug": "winstgevende-website",
   "name": "Winstgevende Website Zelfscan",
   "version": "1.0.0",
-  "tag": "intake",
-  "pipelineId": "",
+  "tag": "winstgevende-website-zelfscan",
+  "pipelineId": "69a174d3ee635f5836a720f7",
+  "groupId": "69a1750cd8a84c6c7ab008c6",
   "calendly": "https://calendly.com/jouw-link",
   "meta": {
     "welcome": {
@@ -13,8 +14,7 @@
       "lead": "Je website bestaat uit 6 schakels. In ~5 minuten zie je waar je sterk staat — en waar de meeste winst te halen is.",
       "bullets": [
         "Een score per schakel — zie direct waar je sterk staat",
-        "Concrete aanbevelingen voor je zwakste plekken",
-        "Resultaten direct naar je inbox"
+        "Concrete aanbevelingen voor je zwakste plekken"
       ],
       "timeEstimate": "12 vragen · ~4 min"
     },
@@ -25,13 +25,13 @@
     },
     "analysis": [
       {
-        "maxScore": 7,
+        "maxScore": 10,
         "level": "Oei.. veel werk aan de winkel",
         "headline": "Je website laat heel veel omzet liggen.",
         "body": "En dat terwijl je wilt groeien{grow}. Het goede nieuws: de schakels zijn te leren. Begin bij het fundament: doelgroep, SEO, AI en landingspagina's."
       },
       {
-        "maxScore": 15,
+        "maxScore": 30,
         "level": "Belangrijke schakels ontbreken",
         "headline": "Je hebt een basis, maar een paar belangrijke schakels ontbreken of zijn zwak.",
         "body": "Het wordt moeilijk om te groeien{grow} zonder het versterken van de ketting. Versterk de zwakke schakels eerst om de omzetlekken in jouw website te dichten."

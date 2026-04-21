@@ -1,8 +1,8 @@
 // Registreer hier elke vragenlijst.
 // Bestandsnaam = slug van de vragenlijst.
 
-import intake from './intake.json';
+import winstgevendeWebsite from './winstgevende-website.json';
 
 export default [
-  intake,
+  winstgevendeWebsite,
 ];

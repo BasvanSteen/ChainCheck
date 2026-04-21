@@ -94,7 +94,33 @@ function App() {
         setChains(set.chains);
         setSetMeta({ id: set.id, slug: set.slug, version: set.version, ...set.meta, strategy: set.strategy });
 
-        if (customer) setCustomerData(customer);
+        if (customer) {
+          setCustomerData(customer);
+
+          // Support both array names and match on slug or id
+          const allScans = customer.chaincheck || customer.questionnaire || [];
+          const scans = allScans.filter(s => s.slug === slug || s.slug === setMeta.id || s.slug === setMeta.slug);
+          const scan  = scans.sort((a, b) => new Date(b.submittedAt || b.completedAt || 0) - new Date(a.submittedAt || a.completedAt || 0))[0];
+
+          if (scan) {
+            if (scan.answers)    setAnswers(scan.answers);
+            if (scan.strategy)   setStrategyData(scan.strategy);
+            if (scan.responseId) setResponseId(scan.responseId);
+            setSavedVersion(scan.version);
+
+            if (scan.version !== set.version) {
+              setView("version-mismatch");
+            } else {
+              setReadOnly(true);
+              setView("results");
+            }
+            setLoadState("ready");
+            return;
+          }
+
+          // No scan for this slug — known fields (email/name) are handled
+          // silently by StrategyScreen via customerData prop
+        }
 
         if (resp && !resp.error) {
           setResponseId(resp.id);
@@ -103,17 +129,6 @@ function App() {
           if (resp.strategy) setStrategyData(resp.strategy);
           setView(resp.version !== set.version ? "version-mismatch" : "results");
           if (resp.version === set.version) setReadOnly(true);
-
-          // Fetch customer profile by email as fallback if no ID in URL
-          if (!urlCustomerId) {
-            const email = resp.strategy?.email;
-            if (email) {
-              fetch(`/api/customer?email=${encodeURIComponent(email)}`)
-                .then(r => r.ok ? r.json() : null)
-                .then(c => { if (c) setCustomerData(c); })
-                .catch(() => {});
-            }
-          }
         }
 
         setLoadState("ready");
@@ -194,7 +209,10 @@ function App() {
           body: JSON.stringify({ slug: currentSlug, version: setMeta.version }),
         });
         const data = await res.json();
-        if (data.id) setResponseId(data.id);
+        if (data.id) {
+          setResponseId(data.id);
+          setParam("response", data.id);
+        }
       }
     } catch (e) {
       console.error("Response ID generation failed:", e);
@@ -279,7 +297,7 @@ function App() {
               chainIndex={view.chainIndex}
               qIndex={view.qIndex}
               selected={currentSelected()}
-              onSelect={onSelect}
+              onSelect={readOnly ? () => {} : onSelect}
               onNext={onNext}
               onPrev={onPrev}
               canNext={currentSelected() != null}
@@ -288,6 +306,7 @@ function App() {
               totalAnswered={totalAnswered}
               totalQuestions={totalQuestions}
               saving={saving}
+              readOnly={readOnly}
             />
           )}
 
@@ -310,16 +329,16 @@ function App() {
               chainVerdict={chainVerdict}
               accent={accent}
               meta={setMeta}
-              slug={currentSlug}
+              slug={setMeta.slug || currentSlug}
               onRestart={onRestart}
               onEdit={readOnly ? onEdit : null}
               responseId={responseId}
               readOnly={readOnly}
               strategy={strategyData}
+              customerId={customerId}
               onCustomerId={(cid) => {
                 setCustomerId(cid);
-                const qs = getParams().toString();
-                window.history.replaceState({}, "", `/${currentSlug}/${cid}${qs ? "?" + qs : ""}`);
+                window.history.replaceState({}, "", `/${setMeta.slug}/${cid}`);
               }}
             />
           )}

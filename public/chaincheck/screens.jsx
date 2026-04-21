@@ -85,7 +85,7 @@ function ChainIntroScreen({ chain, chains, chainIndex, onNext, onPrev, progressS
   );
 }
 
-function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect, onNext, onPrev, canNext, progressStyle, accent, totalAnswered, totalQuestions, saving }) {
+function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect, onNext, onPrev, canNext, progressStyle, accent, totalAnswered, totalQuestions, saving, readOnly }) {
   const question = chain.questions[qIndex];
   const isLast = chainIndex === chains.length - 1 && qIndex === chain.questions.length - 1;
 
@@ -109,7 +109,7 @@ function QuestionScreen({ chain, chains, chainIndex, qIndex, selected, onSelect,
               return (
                 <button
                   key={i}
-                  className={`cc-option ${sel ? "cc-option--sel" : ""}`}
+                  className={`cc-option ${sel ? "cc-option--sel" : ""} ${readOnly ? "cc-option--readonly" : ""}`}
                   onClick={() => onSelect(i)}
                   style={sel ? { borderColor: accent, background: "#FFF7FB" } : undefined}
                 >
@@ -168,20 +168,25 @@ function VersionMismatch({ savedVersion, currentVersion, accent, onViewOld, onRe
 }
 
 function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPrev, accent, saving }) {
-  const prefill = React.useMemo(() => ({
-    ...initialValues,
-    ...(customerData ? {
-      email:     customerData.email          || initialValues?.email     || "",
-      firstName: customerData.firstName      || initialValues?.firstName || "",
-      lastName:  customerData.lastName       || initialValues?.lastName  || "",
-    } : {}),
-  }), []);
+  // Values known from customer profile — used in submit but not shown to user
+  const knownValues = React.useMemo(() => {
+    if (!customerData) return {};
+    const known = {};
+    if (customerData.email)     known.email     = customerData.email;
+    if (customerData.firstName) known.firstName = customerData.firstName;
+    if (customerData.lastName)  known.lastName  = customerData.lastName;
+    return known;
+  }, []);
 
-  const [values, setValues] = React.useState(prefill);
-  const emailField = strategy.fields.find(f => f.type === "email");
-  const canSubmit = emailField ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values[emailField.id] || "") : true;
+  const [values, setValues] = React.useState({ ...initialValues });
+
+  const visibleFields = strategy.fields.filter(f => !(f.id in knownValues));
+  const emailField    = strategy.fields.find(f => f.type === "email");
+  const emailKnown    = emailField && emailField.id in knownValues;
+  const canSubmit     = emailKnown || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values[emailField?.id] || "");
 
   function set(id, val) { setValues(v => ({ ...v, [id]: val })); }
+  function submit() { onSubmit({ ...knownValues, ...values }); }
 
   return (
     <div className="cc-screen cc-strategy">
@@ -190,7 +195,7 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
         <p className="cc-chain-lead">{strategy.lead}</p>
 
         <div className="cc-strategy-fields">
-          {strategy.fields.map(f => (
+          {visibleFields.map(f => (
             <div key={f.id} className="cc-field">
               <label className="cc-field-label">
                 {f.label}
@@ -213,7 +218,7 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
         <button className="cc-nav-back" onClick={onPrev} aria-label="Vorige">
           <IconArrowLeft size={14} /> <span>Vorige</span>
         </button>
-        <CCButton onClick={() => onSubmit(values)} accent={accent} disabled={!canSubmit || saving} size="sm">
+        <CCButton onClick={submit} accent={accent} disabled={!canSubmit || saving} size="sm">
           {saving ? "Opslaan…" : "Toon resultaat"}
         </CCButton>
       </div>

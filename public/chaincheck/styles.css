@@ -262,6 +262,7 @@
 }
 .cc-option:hover { border-color: var(--cc-navy); }
 .cc-option:active { transform: scale(.99); }
+.cc-option--readonly { cursor: default; pointer-events: none; opacity: 0.85; }
 .cc-option-radio {
   width: 22px; height: 22px; border-radius: 50%;
   border: 2px solid #CBD5DB;

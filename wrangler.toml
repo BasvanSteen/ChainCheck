@@ -9,6 +9,6 @@ binding = "ASSETS"
 # Productie-omgevingsvariabelen
 # Geheimen (API-sleutels) zet je via: npx wrangler secret put EXTERNAL_API_KEY
 [vars]
-EXTERNAL_API_URL = "https://api.jouwapp.nl"
+EXTERNAL_API_URL = "https://platform.marketingmadheads.com/api"
 
 # Lokale ontwikkeling: zie .dev.vars (gebaseerd op .dev.vars.example)

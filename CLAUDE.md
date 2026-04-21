@@ -35,10 +35,10 @@ Browser (React SPA)
 
 ```js
 // src/sets/index.js
-import intake    from './intake.json';
-import nieuweSet from './nieuwe-set.json';  // ← toevoegen
+import winstgevendeWebsite from './winstgevende-website.json';
+import nieuweSet           from './nieuwe-set.json';          // ← toevoegen
 
-export default [intake, nieuweSet];         // ← toevoegen
+export default [winstgevendeWebsite, nieuweSet];              // ← toevoegen
 ```
 
 De vragenlijst is daarna bereikbaar op `/<slug>` en via `GET /api/sets/<slug>`.

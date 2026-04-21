@@ -26,11 +26,11 @@ function buildAnalysis(analysisConfig, totalScore, strategy) {
   };
 }
 
-function ShareBar({ responseId }) {
+function ShareBar({ customerId, slug }) {
   const [copied, setCopied] = useState(false);
-  if (!responseId) return null;
+  if (!customerId || !slug) return null;
 
-  const url = window.location.href;
+  const url = `${window.location.origin}/${slug}/${customerId}`;
 
   function copyUrl() {
     navigator.clipboard.writeText(url).then(() => {
@@ -70,11 +70,12 @@ function ScoreDial({ value, accent }) {
   );
 }
 
-function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart, onEdit, responseId, readOnly, strategy, onCustomerId }) {
+function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart, onEdit, responseId, readOnly, strategy, onCustomerId, customerId: customerIdProp }) {
   const [calendly, setCalendly] = React.useState(null);
+  const [customerId, setCustomerId] = React.useState(customerIdProp || null);
 
   React.useEffect(() => {
-    if (!slug) return;
+    if (!slug || readOnly) return;
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -83,7 +84,10 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d?.calendly) setCalendly(d.calendly);
-        if (d?.customerId && onCustomerId) onCustomerId(d.customerId);
+        if (d?.customerId) {
+          setCustomerId(d.customerId);
+          if (onCustomerId) onCustomerId(d.customerId);
+        }
       })
       .catch(() => {});
   }, [slug, responseId]);
@@ -138,7 +142,7 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
       </div>
 
       {/* Share URL */}
-      <ShareBar responseId={responseId} />
+      <ShareBar customerId={customerId} slug={slug} />
 
       {/* Visual chain */}
       <div className="cc-results-chain">

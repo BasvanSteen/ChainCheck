@@ -2,7 +2,7 @@
 # .dev.vars wordt NIET gecommit (staat in .gitignore).
 
 # URL van de lokale tweede applicatie
-EXTERNAL_API_URL=http://localhost:3000
+EXTERNAL_API_URL=http://localhost:4000
 
 # API-sleutel voor de externe applicatie (optioneel in dev)
-EXTERNAL_API_KEY=dev-key
+EXTERNAL_API_KEY=knkjvnhjKGi76tgyHGyi76fFHGf5r5t54oiuqw3$$f
