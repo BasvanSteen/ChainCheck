@@ -477,3 +477,43 @@
   .cc-share { flex-direction: column; align-items: flex-start; }
   .cc-share-url { max-width: 100%; }
 }
+
+/* ── Small mobile (≤ 480px, bijv. 390px) ─────────────── */
+@media (max-width: 480px) {
+  .cc-app { padding: 8px; }
+  .cc-stage { padding: 12px; }
+  .cc-window { padding: 16px; border-radius: 14px; }
+
+  /* Ketting-grid: 2 kolommen, container als grout / items wit */
+  .cc-results-chain {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 6px;
+    background: var(--cc-line);
+    border: none;
+  }
+  .cc-result-link {
+    background: #fff; border-radius: 10px; padding: 12px 8px;
+  }
+  .cc-result-link-icon { width: 44px; height: 44px; }
+  .cc-result-link-label { font-size: 12px; }
+
+  /* Per-schakel cards: compacter */
+  .cc-rcard { padding: 12px; }
+  .cc-rcard-head { gap: 8px; }
+  .cc-rcard-icon { width: 32px; height: 32px; }
+  .cc-rcard-title { font-size: 15px; }
+  .cc-rcard-score { min-width: 56px; }
+  .cc-rcard-bar { width: 48px; }
+
+  /* Hero: score onder tekst, niet naast */
+  .cc-results-score { flex-wrap: wrap; }
+  .cc-dial svg { width: 96px; height: 96px; }
+
+  /* Focus blok: items stacked */
+  .cc-focus { padding: 16px; }
+  .cc-focus-item { padding: 12px; }
+
+  /* CTA: minder padding */
+  .cc-cta { padding: 18px; gap: 14px; }
+}

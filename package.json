@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --env dev",
     "deploy": "wrangler deploy",
     "kv:create": "wrangler kv namespace create RESPONSES",
     "kv:create:preview": "wrangler kv namespace create RESPONSES --preview"
