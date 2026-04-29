@@ -190,6 +190,13 @@ export default {
       if (setMatch && request.method === 'GET')
         return handleGetSet(setMatch[1]);
 
+      const calendlyMatch = route.match(/^\/sets\/([a-z0-9_-]+)\/calendly$/);
+      if (calendlyMatch && request.method === 'GET') {
+        const set = findSet(calendlyMatch[1]);
+        if (!set) return json({ error: 'Not found' }, 404);
+        return json({ calendly: set.calendly || null });
+      }
+
       if (route === '/responses' && request.method === 'POST') {
         let body;
         try { body = await request.json(); } catch { body = {}; }

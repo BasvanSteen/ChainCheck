@@ -72,10 +72,19 @@ function ScoreDial({ value, accent }) {
 
 function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart, onEdit, responseId, readOnly, strategy, onCustomerId, customerId: customerIdProp }) {
   const [calendly, setCalendly] = React.useState(null);
+  const [submitDone, setSubmitDone] = React.useState(false);
   const [customerId, setCustomerId] = React.useState(customerIdProp || null);
 
   React.useEffect(() => {
-    if (!slug || readOnly) return;
+    if (!slug) { setSubmitDone(true); return; }
+    if (readOnly) {
+      fetch(`/api/sets/${slug}/calendly`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d?.calendly) setCalendly(d.calendly); })
+        .catch(() => {})
+        .finally(() => setSubmitDone(true));
+      return;
+    }
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -89,7 +98,8 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
           if (onCustomerId) onCustomerId(d.customerId);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setSubmitDone(true));
   }, [slug, responseId]);
   const perChain = chains.map((c) => {
     let s = 0;
@@ -223,8 +233,21 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
         </div>
         <div className="cc-cta-right">
           <CCButton accent={accent} size="sm"
-            onClick={() => { const url = calendly || cta.buttonUrl; if (url) window.open(url, "_blank"); }}>
-            {cta.buttonLabel || "Plan een call"}
+            disabled={!submitDone || !(calendly || cta.buttonUrl)}
+            onClick={() => {
+              const base = calendly || cta.buttonUrl;
+              if (!base) return;
+              try {
+                const u = new URL(base);
+                if (strategy?.firstName) u.searchParams.set("first_name", strategy.firstName);
+                if (strategy?.lastName)  u.searchParams.set("last_name",  strategy.lastName);
+                if (strategy?.email)     u.searchParams.set("email",      strategy.email);
+                window.open(u.toString(), "_blank");
+              } catch {
+                window.open(base, "_blank");
+              }
+            }}>
+            {!submitDone ? "Laden…" : (cta.buttonLabel || "Plan een call")}
           </CCButton>
           <button className="cc-cta-restart" onClick={onRestart}>Opnieuw doen</button>
         </div>
