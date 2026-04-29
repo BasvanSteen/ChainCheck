@@ -77,14 +77,19 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
 
   React.useEffect(() => {
     if (!slug) { setSubmitDone(true); return; }
-    if (readOnly) {
-      fetch(`/api/sets/${slug}/calendly`)
+
+    function fetchCalendlyFallback() {
+      return fetch(`/api/sets/${slug}/calendly`)
         .then(r => r.ok ? r.json() : null)
         .then(d => { if (d?.calendly) setCalendly(d.calendly); })
-        .catch(() => {})
-        .finally(() => setSubmitDone(true));
+        .catch(() => {});
+    }
+
+    if (readOnly) {
+      fetchCalendlyFallback().finally(() => setSubmitDone(true));
       return;
     }
+
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -92,13 +97,17 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
     })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
-        if (d?.calendly) setCalendly(d.calendly);
         if (d?.customerId) {
           setCustomerId(d.customerId);
           if (onCustomerId) onCustomerId(d.customerId);
         }
+        if (d?.calendly) {
+          setCalendly(d.calendly);
+        } else {
+          return fetchCalendlyFallback();
+        }
       })
-      .catch(() => {})
+      .catch(() => fetchCalendlyFallback())
       .finally(() => setSubmitDone(true));
   }, [slug, responseId]);
   const perChain = chains.map((c) => {
