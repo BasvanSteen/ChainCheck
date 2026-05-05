@@ -127,9 +127,22 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
   const analysis = buildAnalysis(meta?.analysis, total, strategy);
   const weakest = [...perChain].sort((a, b) => a.pct - b.pct).slice(0, 2);
   const cta = meta?.cta || {};
+  const orderValueRaw = strategy?.orderValue;
+  const currentClientsRaw = strategy?.currentClients;
+  const orderValueNum = orderValueRaw != null && orderValueRaw !== ""
+    ? Number(String(orderValueRaw).replace(/\./g, "").replace(",", "."))
+    : null;
+  const currentClientsNum = currentClientsRaw != null && currentClientsRaw !== ""
+    ? Number(String(currentClientsRaw).replace(/\./g, "").replace(",", "."))
+    : null;
+  const monthlyRevenue = (orderValueNum != null && currentClientsNum != null)
+    ? orderValueNum * currentClientsNum
+    : orderValueNum;
+  const showCta = monthlyRevenue == null || monthlyRevenue >= 2500;
 
   return (
     <div className="cc-screen cc-results">
+
       {/* HERO */}
       <div className="cc-results-hero">
         <div>
@@ -162,6 +175,35 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
 
       {/* Share URL */}
       <ShareBar customerId={customerId} slug={slug} />
+
+      {/* CTA */}
+      {showCta && (
+        <div className="cc-cta">
+          <div>
+            <h2 className="cc-cta-h">{cta.heading || "Even praktisch meekijken?"}</h2>
+            <p className="cc-cta-p">{cta.body || "Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen."}</p>
+          </div>
+          <div className="cc-cta-right">
+            <CCButton accent={accent} size="sm"
+              disabled={!submitDone || !(calendly || cta.buttonUrl)}
+              onClick={() => {
+                const base = calendly || cta.buttonUrl;
+                if (!base) return;
+                try {
+                  const u = new URL(base);
+                  if (strategy?.firstName) u.searchParams.set("first_name", strategy.firstName);
+                  if (strategy?.lastName)  u.searchParams.set("last_name",  strategy.lastName);
+                  if (strategy?.email)     u.searchParams.set("email",      strategy.email);
+                  window.open(u.toString(), "_blank");
+                } catch {
+                  window.open(base, "_blank");
+                }
+              }}>
+              {!submitDone ? "Laden…" : (cta.buttonLabel || "Plan een call")}
+            </CCButton>
+          </div>
+        </div>
+      )}
 
       {/* Visual chain */}
       <div className="cc-results-chain">
@@ -234,32 +276,8 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="cc-cta">
-        <div>
-          <h2 className="cc-cta-h">{cta.heading || "Even praktisch meekijken?"}</h2>
-          <p className="cc-cta-p">{cta.body || "Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen."}</p>
-        </div>
-        <div className="cc-cta-right">
-          <CCButton accent={accent} size="sm"
-            disabled={!submitDone || !(calendly || cta.buttonUrl)}
-            onClick={() => {
-              const base = calendly || cta.buttonUrl;
-              if (!base) return;
-              try {
-                const u = new URL(base);
-                if (strategy?.firstName) u.searchParams.set("first_name", strategy.firstName);
-                if (strategy?.lastName)  u.searchParams.set("last_name",  strategy.lastName);
-                if (strategy?.email)     u.searchParams.set("email",      strategy.email);
-                window.open(u.toString(), "_blank");
-              } catch {
-                window.open(base, "_blank");
-              }
-            }}>
-            {!submitDone ? "Laden…" : (cta.buttonLabel || "Plan een call")}
-          </CCButton>
-          <button className="cc-cta-restart" onClick={onRestart}>Opnieuw doen</button>
-        </div>
+      <div className="cc-results-restart">
+        <button className="cc-cta-restart" onClick={onRestart}>Opnieuw doen</button>
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ function CCButton({ children, onClick, variant = "solid", accent = "#EE3D96", di
   );
 }
 
-function Welcome({ meta, accent, onStart, chains }) {
+function Welcome({ meta, accent, onStart }) {
   const { welcome } = meta;
   return (
     <div className="cc-screen cc-welcome">
@@ -71,7 +71,7 @@ function ChainIntroScreen({ chain, chains, chainIndex, onNext, onPrev, progressS
         <div className="cc-chain-intro-icon" style={{ color: accent }}>
           <Icon size={36} color={accent} />
         </div>
-        <h2 className="cc-chain-title" style={{ color: accent }}>{chain.title}</h2>
+        <h2 className="cc-chain-title">{chain.title}</h2>
         <p className="cc-chain-lead">{chain.lead}</p>
       </div>
 
@@ -176,17 +176,71 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
     if (customerData.firstName) known.firstName = customerData.firstName;
     if (customerData.lastName)  known.lastName  = customerData.lastName;
     return known;
-  }, []);
+  }, [customerData]);
 
   const [values, setValues] = React.useState({ ...initialValues });
+  const [activeSectionIndex, setActiveSectionIndex] = React.useState(0);
 
   const visibleFields = strategy.fields.filter(f => !(f.id in knownValues));
-  const emailField    = strategy.fields.find(f => f.type === "email");
-  const emailKnown    = emailField && emailField.id in knownValues;
-  const canSubmit     = emailKnown || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values[emailField?.id] || "");
+
+  const canSubmit = React.useMemo(() => {
+    return strategy.fields.every(f => {
+      if (!f.required) return true;
+      const val = knownValues[f.id] ?? values[f.id] ?? "";
+      if (f.type === "email") return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      return String(val).trim().length > 0;
+    });
+  }, [strategy.fields, knownValues, values]);
+  const strategySteps = Array.isArray(strategy.steps) ? strategy.steps : [];
+
+  const sections = React.useMemo(() => {
+    if (!strategySteps.length) return [{ id: "default", fields: visibleFields }];
+
+    const stepIds = new Set(strategySteps.map(step => step.id));
+    const mappedSections = strategySteps.map(step => ({
+      ...step,
+      fields: visibleFields.filter(field => field.stepId === step.id),
+    })).filter(section => section.fields.length);
+
+    const remainingFields = visibleFields.filter(field => !field.stepId || !stepIds.has(field.stepId));
+    if (remainingFields.length) {
+      mappedSections.push({ id: "default", fields: remainingFields });
+    }
+
+    return mappedSections.length ? mappedSections : [{ id: "default", fields: [] }];
+  }, [strategySteps, visibleFields]);
+
+  React.useEffect(() => {
+    setActiveSectionIndex(0);
+  }, [sections.length]);
 
   function set(id, val) { setValues(v => ({ ...v, [id]: val })); }
   function submit() { onSubmit({ ...knownValues, ...values }); }
+  function fieldPlaceholder(field) {
+    if (field.placeholder) return field.placeholder;
+    if (field.type === "email") return "jouw@email.nl";
+    if (field.type === "number") return "0";
+    return "";
+  }
+
+  const activeSection = sections[activeSectionIndex] || sections[0] || { fields: [] };
+  const isLastSection = activeSectionIndex >= sections.length - 1;
+
+  function goPrev() {
+    if (activeSectionIndex > 0) {
+      setActiveSectionIndex(i => i - 1);
+      return;
+    }
+    onPrev();
+  }
+
+  function goNext() {
+    if (isLastSection) {
+      submit();
+      return;
+    }
+    setActiveSectionIndex(i => Math.min(i + 1, sections.length - 1));
+  }
 
   return (
     <div className="cc-screen cc-strategy">
@@ -194,32 +248,55 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
         <h2 className="cc-chain-title" style={{ color: accent }}>{strategy.title}</h2>
         <p className="cc-chain-lead">{strategy.lead}</p>
 
-        <div className="cc-strategy-fields">
-          {visibleFields.map(f => (
-            <div key={f.id} className="cc-field">
-              <label className="cc-field-label">
-                {f.label}
-                {f.required && <span className="cc-field-required" style={{ color: accent }}>*</span>}
-              </label>
-              <input
-                className="cc-field-input"
-                type={f.type === "number" ? "number" : f.type === "email" ? "email" : "text"}
-                value={values[f.id] || ""}
-                onChange={e => set(f.id, e.target.value)}
-                placeholder={f.type === "email" ? "jouw@email.nl" : f.type === "number" ? "0" : ""}
-                min={f.type === "number" ? 0 : undefined}
-              />
+        {strategy.note && (
+          <div className="cc-strategy-note">
+            {strategy.note}
+          </div>
+        )}
+
+        {sections.length > 1 && (
+          <div className="cc-strategy-stepcount">Stap {activeSectionIndex + 1} van {sections.length}</div>
+        )}
+
+        <div className="cc-strategy-sections">
+          <section className="cc-strategy-section">
+            {(activeSection.eyebrow || activeSection.title || activeSection.body) && (
+              <div className="cc-strategy-section-head">
+                {activeSection.eyebrow && <div className="cc-eyebrow" style={{ color: accent }}>{activeSection.eyebrow}</div>}
+                {activeSection.title && <h3 className="cc-strategy-section-title">{activeSection.title}</h3>}
+                {activeSection.body && <p className="cc-strategy-section-body">{activeSection.body}</p>}
+              </div>
+            )}
+
+            <div className="cc-strategy-fields">
+              {activeSection.fields.map(f => (
+                <div key={f.id} className="cc-field">
+                  <label className="cc-field-label">
+                    {f.label}
+                    {f.required && <span className="cc-field-required" style={{ color: accent }}>*</span>}
+                  </label>
+                  {f.helper && <div className="cc-field-helper">{f.helper}</div>}
+                  <input
+                    className="cc-field-input"
+                    type={f.type === "number" ? "number" : f.type === "email" ? "email" : "text"}
+                    value={values[f.id] || ""}
+                    onChange={e => set(f.id, e.target.value)}
+                    placeholder={fieldPlaceholder(f)}
+                    min={f.type === "number" ? 0 : undefined}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+          </section>
         </div>
       </div>
 
       <div className="cc-nav">
-        <button className="cc-nav-back" onClick={onPrev} aria-label="Vorige">
-          <IconArrowLeft size={14} /> <span>Vorige</span>
+        <button className="cc-nav-back" onClick={goPrev} aria-label="Vorige">
+          <IconArrowLeft size={14} /> <span>{activeSectionIndex > 0 ? "Vorige stap" : "Vorige"}</span>
         </button>
-        <CCButton onClick={submit} accent={accent} disabled={!canSubmit || saving} size="sm">
-          {saving ? "Opslaan…" : "Toon resultaat"}
+        <CCButton onClick={goNext} accent={accent} disabled={saving || (isLastSection && !canSubmit)} size="sm">
+          {saving ? "Opslaan…" : (isLastSection ? (strategy.submitLabel || "Toon resultaat") : "Volgende stap")}
         </CCButton>
       </div>
     </div>

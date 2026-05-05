@@ -4,8 +4,6 @@
   "name": "Winstgevende Website Zelfscan",
   "version": "1.0.0",
   "tag": "winstgevende-website-zelfscan",
-  "pipelineId": "69a174d3ee635f5836a720f7",
-  "groupId": "69a1750cd8a84c6c7ab008c6",
   "calendly": "https://calendly.com/marketing-madheads-sb/madhead-gameplan-wwsk",
   "meta": {
     "welcome": {
@@ -19,9 +17,9 @@
       "timeEstimate": "12 vragen · ~4 min"
     },
     "cta": {
-      "heading": "Even praktisch meekijken?",
-      "body": "Je staat er niet alleen voor. Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen.",
-      "buttonLabel": "Plan een call"
+      "heading": "Verder praten over de uitkomst?",
+      "body": "Plan een korte, vrijblijvende call. Dan bespreken we de uitkomst en bepalen we welke vervolgstap het meest logisch is.",
+      "buttonLabel": "Plan een gesprek"
     },
     "analysis": [
       {
@@ -322,15 +320,34 @@
     }
   ],
   "strategy": {
-    "title": "Bijna klaar — nog één stap",
-    "lead": "We sturen je de resultaten toe en vertellen je precies waar de meeste winst voor jouw website zit.",
+    "title": "Aanvullende gegevens",
+    "submitLabel": "Toon resultaat",
+    "steps": [
+      {
+        "id": "situatie",
+        "eyebrow": "Stap 1",
+        "title": "Huidige situatie"
+      },
+      {
+        "id": "ambitie",
+        "eyebrow": "Stap 2",
+        "title": "Groeidoel",
+        "body": "Zo kunnen we de uitkomst koppelen aan een realistische vervolgstap voor de komende periode."
+      },
+      {
+        "id": "contact",
+        "eyebrow": "Stap 3",
+        "title": "Contactgegevens",
+        "body": "Vul je contactgegevens in zodat we je kunnen bereiken."
+      }
+    ],
     "fields": [
-      { "id": "firstName",      "label": "Voornaam",                                            "type": "text",   "required": false },
-      { "id": "lastName",       "label": "Achternaam",                                          "type": "text",   "required": false },
-      { "id": "email",          "label": "E-mailadres",                                         "type": "email",  "required": true  },
-      { "id": "orderValue",     "label": "Gemiddelde orderwaarde per klant (€)",                "type": "number", "required": false },
-      { "id": "currentClients", "label": "Huidig aantal klanten per maand",                     "type": "number", "required": false },
-      { "id": "targetClients",  "label": "Gewenst aantal klanten per maand (over 6–12 maanden)","type": "number", "required": false }
+      { "id": "currentClients", "stepId": "situatie", "label": "Aantal klanten per maand",                                "type": "number", "required": false, "placeholder": "Bijv. 12" },
+      { "id": "orderValue",     "stepId": "situatie", "label": "Gemiddelde waarde per klant (€)",              "type": "number", "required": false, "placeholder": "Bijv. 750" },
+      { "id": "targetClients",  "stepId": "ambitie",  "label": "Gewenst aantal klanten per maand (indicatie)", "helper": "Bijvoorbeeld je doel voor de komende 6 tot 12 maanden.",    "type": "number", "required": false, "placeholder": "Bijv. 20" },
+      { "id": "firstName",      "stepId": "contact",  "label": "Voornaam",                                     "type": "text",   "required": true,  "placeholder": "Henk" },
+      { "id": "lastName",       "stepId": "contact",  "label": "Achternaam",                                   "type": "text",   "required": true,  "placeholder": "de Vries" },
+      { "id": "email",          "stepId": "contact",  "label": "E-mailadres",                                  "type": "email",  "required": true,  "placeholder": "jij@bedrijf.nl" }
     ]
   }
 }

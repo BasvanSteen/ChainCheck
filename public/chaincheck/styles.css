@@ -230,6 +230,7 @@
 .cc-chain-title {
   font-size: clamp(34px, 4.5vw, 52px); font-weight: 700;
   margin: 0 0 10px; line-height: 1.05; letter-spacing: -0.01em;
+  color: var(--cc-navy);
 }
 .cc-chain-lead {
   font-size: clamp(16px, 1.8vw, 20px); line-height: 1.4;
@@ -353,11 +354,61 @@
 
 /* ── Strategy screen ─────────────────────────────────── */
 .cc-strategy-body { padding-top: 4px; }
+.cc-strategy-note {
+  max-width: 720px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(137,210,220,.2);
+  color: var(--cc-navy);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.cc-strategy-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 24px;
+}
+.cc-strategy-stepcount {
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cc-muted);
+}
+.cc-strategy-section {
+  border: 1px solid var(--cc-line);
+  border-radius: 18px;
+  background: #fff;
+  padding: 18px;
+}
+.cc-strategy-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cc-strategy-section-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--cc-navy);
+}
+.cc-strategy-section-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cc-muted);
+  max-width: 640px;
+}
 .cc-strategy-fields { display: flex; flex-direction: column; gap: 14px; margin-top: 24px; }
 .cc-field { display: flex; flex-direction: column; gap: 6px; }
 .cc-field-label {
   font-size: 14px; font-weight: 600; color: var(--cc-navy);
   display: flex; align-items: center; gap: 4px;
+}
+.cc-field-helper {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cc-muted);
 }
 .cc-field-required { font-size: 16px; line-height: 1; }
 .cc-field-input {
@@ -379,6 +430,14 @@
 .cc-cta-restart {
   background: transparent; border: 0; color: rgba(255,255,255,.8);
   cursor: pointer; font: inherit; font-size: 13px; text-decoration: underline;
+}
+.cc-results-restart {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.cc-results-restart .cc-cta-restart {
+  color: var(--cc-muted);
 }
 
 /* ── Share URL bar ───────────────────────────────────── */
