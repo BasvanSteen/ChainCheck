@@ -90,10 +90,12 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
       return;
     }
 
+    const referrer = document.referrer || null;
+
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ responseId: responseId || undefined, slug, strategy, answers, version: meta?.version }),
+      body: JSON.stringify({ responseId: responseId || undefined, slug, strategy, answers, version: meta?.version, referrer }),
     })
       .then(r => r.ok ? r.json() : null)
       .then(d => {

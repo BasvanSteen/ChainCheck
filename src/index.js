@@ -91,7 +91,7 @@ async function handleSubmit(request, env) {
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  const { slug, responseId, strategy, answers, version } = body;
+  const { slug, responseId, strategy, answers, version, referrer } = body;
   if (!slug) return json({ error: 'Missing required field: slug' }, 400);
 
   console.log('[submit] slug:', slug, '| responseId:', responseId || '(none)');
@@ -120,6 +120,7 @@ async function handleSubmit(request, env) {
           name: set.name,
           tag: set.tag,
           version,
+          referrer,
           strategy,
           answers,
           result,
