@@ -211,12 +211,13 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
     return mappedSections.length ? mappedSections : [{ id: "default", fields: [] }];
   }, [strategySteps, visibleFields]);
 
-  React.useEffect(() => {
-    setActiveSectionIndex(0);
-    // Skip intro for contact section if it's the only/last section
-    const shouldSkipIntro = sections.length > 0 && 0 >= sections.length - 1;
-    setShowingIntro(!shouldSkipIntro);
-  }, [sections.length]);
+   React.useEffect(() => {
+     setActiveSectionIndex(0);
+     // Skip intro if there's only one section (go directly to fields)
+     // This handles when contact fields are pre-filled and the contact step is hidden
+     const shouldSkipIntro = sections.length > 0 && 0 >= sections.length - 1;
+     setShowingIntro(!shouldSkipIntro);
+   }, [sections.length]);
 
   function set(id, val) { setValues(v => ({ ...v, [id]: val })); }
   function submit() { onSubmit({ ...knownValues, ...values }); }
