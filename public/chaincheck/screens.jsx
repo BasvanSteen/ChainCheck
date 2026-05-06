@@ -180,6 +180,7 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
 
   const [values, setValues] = React.useState({ ...initialValues });
   const [activeSectionIndex, setActiveSectionIndex] = React.useState(0);
+  const [showingIntro, setShowingIntro] = React.useState(true);
 
   const visibleFields = strategy.fields.filter(f => !(f.id in knownValues));
 
@@ -212,6 +213,9 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
 
   React.useEffect(() => {
     setActiveSectionIndex(0);
+    // Skip intro for contact section if it's the only/last section
+    const shouldSkipIntro = sections.length > 0 && 0 >= sections.length - 1;
+    setShowingIntro(!shouldSkipIntro);
   }, [sections.length]);
 
   function set(id, val) { setValues(v => ({ ...v, [id]: val })); }
@@ -227,47 +231,64 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
   const isLastSection = activeSectionIndex >= sections.length - 1;
 
   function goPrev() {
-    if (activeSectionIndex > 0) {
-      setActiveSectionIndex(i => i - 1);
+    if (showingIntro) {
+      onPrev();
       return;
     }
-    onPrev();
+    setShowingIntro(true);
   }
 
   function goNext() {
+    if (showingIntro) {
+      setShowingIntro(false);
+      return;
+    }
     if (isLastSection) {
       submit();
       return;
     }
-    setActiveSectionIndex(i => Math.min(i + 1, sections.length - 1));
+    // Move to next section
+    const nextIndex = Math.min(activeSectionIndex + 1, sections.length - 1);
+    setActiveSectionIndex(nextIndex);
+    // Skip intro for contact section (last section)
+    const isNextContactSection = nextIndex >= sections.length - 1;
+    setShowingIntro(!isNextContactSection);
   }
 
+  // Intro screen
+  if (showingIntro) {
+    return (
+      <div className="cc-screen cc-chain-intro">
+        <div className="cc-chain-intro-body">
+          {activeSection.eyebrow && <div className="cc-eyebrow" style={{ color: accent }}>{activeSection.eyebrow}</div>}
+          <h2 className="cc-chain-title">{activeSection.title || strategy.title}</h2>
+          <p className="cc-chain-lead">{activeSection.body || strategy.lead}</p>
+          {strategy.note && (
+            <div className="cc-strategy-note">
+              {strategy.note}
+            </div>
+          )}
+        </div>
+
+        <div className="cc-nav">
+          <button className="cc-nav-back" onClick={goPrev} aria-label="Vorige">
+            <IconArrowLeft size={14} /> <span>Vorige</span>
+          </button>
+          <CCButton onClick={goNext} accent={accent} size="sm">Volgende</CCButton>
+        </div>
+      </div>
+    );
+  }
+
+  // Fields screen
   return (
     <div className="cc-screen cc-strategy">
       <div className="cc-strategy-body">
-        <h2 className="cc-chain-title" style={{ color: accent }}>{strategy.title}</h2>
-        <p className="cc-chain-lead">{strategy.lead}</p>
-
-        {strategy.note && (
-          <div className="cc-strategy-note">
-            {strategy.note}
-          </div>
-        )}
-
         {sections.length > 1 && (
           <div className="cc-strategy-stepcount">Stap {activeSectionIndex + 1} van {sections.length}</div>
         )}
-
-        <div className="cc-strategy-sections">
-          <section className="cc-strategy-section">
-            {(activeSection.eyebrow || activeSection.title || activeSection.body) && (
-              <div className="cc-strategy-section-head">
-                {activeSection.eyebrow && <div className="cc-eyebrow" style={{ color: accent }}>{activeSection.eyebrow}</div>}
-                {activeSection.title && <h3 className="cc-strategy-section-title">{activeSection.title}</h3>}
-                {activeSection.body && <p className="cc-strategy-section-body">{activeSection.body}</p>}
-              </div>
-            )}
-
+        <div className="cc-question-body">
+          <div className="cc-q-block">
             <div className="cc-strategy-fields">
               {activeSection.fields.map(f => (
                 <div key={f.id} className="cc-field">
@@ -287,13 +308,13 @@ function StrategyScreen({ strategy, initialValues, customerData, onSubmit, onPre
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         </div>
       </div>
 
       <div className="cc-nav">
         <button className="cc-nav-back" onClick={goPrev} aria-label="Vorige">
-          <IconArrowLeft size={14} /> <span>{activeSectionIndex > 0 ? "Vorige stap" : "Vorige"}</span>
+          <IconArrowLeft size={14} /> <span>Vorige stap</span>
         </button>
         <CCButton onClick={goNext} accent={accent} disabled={saving || (isLastSection && !canSubmit)} size="sm">
           {saving ? "Opslaan…" : (isLastSection ? (strategy.submitLabel || "Toon resultaat") : "Volgende stap")}

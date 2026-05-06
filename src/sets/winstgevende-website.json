@@ -321,12 +321,14 @@
   ],
   "strategy": {
     "title": "Aanvullende gegevens",
+    "lead": "Nog enkele vragen over je huidige situatie en groeidoel, gevolgd door je contactgegevens.",
     "submitLabel": "Toon resultaat",
     "steps": [
       {
         "id": "situatie",
         "eyebrow": "Stap 1",
-        "title": "Huidige situatie"
+        "title": "Huidige situatie",
+        "body": "Waar wil je over 6 tot 12 maanden staan?\n\nAls je bijvoorbeeld 200% wilt groeien, pak je het anders aan dan wanneer je 10% wilt groeien. Jouw ambitie klikt alles in elkaar."
       },
       {
         "id": "ambitie",

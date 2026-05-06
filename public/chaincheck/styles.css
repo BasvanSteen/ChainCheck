@@ -398,8 +398,9 @@
   line-height: 1.5;
   color: var(--cc-muted);
   max-width: 640px;
+  white-space: pre-line;
 }
-.cc-strategy-fields { display: flex; flex-direction: column; gap: 14px; margin-top: 24px; }
+.cc-strategy-fields { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
 .cc-field { display: flex; flex-direction: column; gap: 6px; }
 .cc-field-label {
   font-size: 14px; font-weight: 600; color: var(--cc-navy);
