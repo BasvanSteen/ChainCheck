@@ -4,7 +4,7 @@
   "name": "Winstgevende Website Zelfscan",
   "version": "1.0.0",
   "tag": "winstgevende-website-zelfscan",
-  "calendly": "https://calendly.com/marketing-madheads-sb/madhead-gameplan-wwsk",
+  "calendly": "https://calendly.com/marketing-madheads-sb/madhead-sparringsessie-websitecheck",
   "meta": {
     "welcome": {
       "badge": "Winstgevende Website Zelfscan · gratis",
@@ -17,8 +17,8 @@
       "timeEstimate": "12 vragen · ~4 min"
     },
     "cta": {
-      "heading": "Verder praten over de uitkomst?",
-      "body": "Plan een korte, vrijblijvende call. Dan bespreken we de uitkomst en bepalen we welke vervolgstap het meest logisch is.",
+      "heading": "Even sparren?",
+      "body": "Ontdek in 10 minuten in welke schakels jij de groei laat liggen. Het kost je niets, en levert je een hoop helderheid.",
       "buttonLabel": "Plan een gesprek"
     },
     "analysis": [
