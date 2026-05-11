@@ -92,7 +92,7 @@ function App() {
     Promise.all([fetchSet, fetchResp, fetchCustomer])
       .then(([set, resp, customer]) => {
         setChains(set.chains);
-        setSetMeta({ id: set.id, slug: set.slug, version: set.version, ...set.meta, strategy: set.strategy });
+        setSetMeta({ id: set.id, slug: set.slug, name: set.name, version: set.version, ...set.meta, strategy: set.strategy });
 
         if (customer) {
           setCustomerData(customer);

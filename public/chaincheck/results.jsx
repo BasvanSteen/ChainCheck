@@ -105,6 +105,7 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
       body: JSON.stringify({
         responseId: responseId || undefined,
         slug,
+        name: meta?.name,
         strategy,
         answers,
         version: meta?.version,

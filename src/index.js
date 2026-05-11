@@ -91,7 +91,7 @@ async function handleSubmit(request, env) {
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  const { slug, responseId, strategy, answers, version, referrer, shareUrl } = body;
+  const { slug, responseId, name, strategy, answers, version, referrer, shareUrl } = body;
   if (!slug) return json({ error: 'Missing required field: slug' }, 400);
 
   console.log('[submit] slug:', slug, '| responseId:', responseId || '(none)');
@@ -106,6 +106,7 @@ async function handleSubmit(request, env) {
     ? `${requestOrigin}/${slug}?response=${encodeURIComponent(responseId)}`
     : `${requestOrigin}/${slug}`;
   const resolvedShareUrl = typeof shareUrl === 'string' && shareUrl.trim() ? shareUrl.trim() : fallbackShareUrl;
+  const resolvedName = typeof name === 'string' && name.trim() ? name.trim() : set.name;
   let customerId = null;
 
   if (externalUrl) {
@@ -122,7 +123,7 @@ async function handleSubmit(request, env) {
           pipelineId: set.pipelineId,
           groupId: set.groupId,
           slug: set.slug,
-          name: set.name,
+          name: resolvedName,
           tag: set.tag,
           version,
           referrer,
