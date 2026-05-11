@@ -91,7 +91,7 @@ async function handleSubmit(request, env) {
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  const { slug, responseId, strategy, answers, version, referrer } = body;
+  const { slug, responseId, strategy, answers, version, referrer, shareUrl } = body;
   if (!slug) return json({ error: 'Missing required field: slug' }, 400);
 
   console.log('[submit] slug:', slug, '| responseId:', responseId || '(none)');
@@ -101,6 +101,11 @@ async function handleSubmit(request, env) {
 
   const result = computeResult(set, answers || {});
   const externalUrl = env.EXTERNAL_API_URL;
+  const requestOrigin = new URL(request.url).origin;
+  const fallbackShareUrl = responseId
+    ? `${requestOrigin}/${slug}?response=${encodeURIComponent(responseId)}`
+    : `${requestOrigin}/${slug}`;
+  const resolvedShareUrl = typeof shareUrl === 'string' && shareUrl.trim() ? shareUrl.trim() : fallbackShareUrl;
   let customerId = null;
 
   if (externalUrl) {
@@ -121,6 +126,7 @@ async function handleSubmit(request, env) {
           tag: set.tag,
           version,
           referrer,
+          shareUrl: resolvedShareUrl,
           strategy,
           answers,
           result,

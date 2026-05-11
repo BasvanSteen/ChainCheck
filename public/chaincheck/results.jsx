@@ -26,6 +26,13 @@ function buildAnalysis(analysisConfig, totalScore, strategy) {
   };
 }
 
+function buildShareUrl({ slug, customerId, responseId }) {
+  if (!slug) return null;
+  if (customerId) return `${window.location.origin}/${slug}/${customerId}`;
+  if (responseId) return `${window.location.origin}/${slug}?response=${encodeURIComponent(responseId)}`;
+  return `${window.location.origin}/${slug}`;
+}
+
 function ShareBar({ customerId, slug }) {
   const [copied, setCopied] = useState(false);
   if (!customerId || !slug) return null;
@@ -95,7 +102,15 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ responseId: responseId || undefined, slug, strategy, answers, version: meta?.version, referrer }),
+      body: JSON.stringify({
+        responseId: responseId || undefined,
+        slug,
+        strategy,
+        answers,
+        version: meta?.version,
+        referrer,
+        shareUrl: buildShareUrl({ slug, customerId: customerId || customerIdProp, responseId }),
+      }),
     })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
