@@ -91,19 +91,24 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
     }
 
     const referrer = document.referrer || null;
+    const shareUrl = responseId && slug
+      ? `${window.location.origin}/${slug}`
+      : null;
+    const payload = {
+      responseId: responseId || undefined,
+      slug,
+      name: meta?.name,
+      strategy,
+      answers,
+      version: meta?.version,
+      referrer,
+      shareUrl: shareUrl || undefined,
+    };
 
     fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        responseId: responseId || undefined,
-        slug,
-        name: meta?.name,
-        strategy,
-        answers,
-        version: meta?.version,
-        referrer,
-      }),
+      body: JSON.stringify(payload),
     })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
