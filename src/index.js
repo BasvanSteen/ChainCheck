@@ -145,9 +145,34 @@ async function handleSubmit(request, env) {
     }
   }
 
-  const shareUrl = customerId ? `${requestOrigin}/${slug}/${customerId}` : null;
+   const shareUrl = customerId ? `${requestOrigin}/${slug}/${customerId}` : null;
 
-  return json({ ok: true, calendly: set.calendly, customerId, shareUrl });
+   // Send shareUrl to external API after receiving customerId
+   if (shareUrl && externalUrl && customerId) {
+     try {
+       const shareRes = await fetch(`${externalUrl}/api-internal/questionnaire/share`, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'X-Internal-Tool': 'chaincheck',
+           ...(env.EXTERNAL_API_KEY ? { 'Authorization': `Bearer ${env.EXTERNAL_API_KEY}` } : {}),
+         },
+         body: JSON.stringify({
+           customerId,
+           shareUrl,
+           slug: set.slug,
+         }),
+       });
+       if (!shareRes.ok) {
+         const errText = await shareRes.text().catch(() => '(no body)');
+         console.warn('[submit] share URL sync failed | status:', shareRes.status, '| body:', errText);
+       }
+     } catch (e) {
+       console.warn('[submit] share URL sync unreachable:', e.message);
+     }
+   }
+
+   return json({ ok: true, calendly: set.calendly, customerId, shareUrl });
 }
 
 // Customer proxy — fetches customer profile from external API by id or email
