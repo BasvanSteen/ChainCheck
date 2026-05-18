@@ -74,6 +74,9 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
   const [calendly, setCalendly] = React.useState(null);
   const [submitDone, setSubmitDone] = React.useState(false);
   const [customerId, setCustomerId] = React.useState(customerIdProp || null);
+  const [ctaIsSticky, setCtaIsSticky] = React.useState(false);
+  const [ctaStatic, setCtaStatic] = React.useState(false);
+  const ctaSentinelRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!slug) { setSubmitDone(true); return; }
@@ -125,6 +128,7 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
       .catch(() => fetchCalendlyFallback())
       .finally(() => setSubmitDone(true));
   }, [slug, responseId]);
+
   const perChain = chains.map((c) => {
     let s = 0;
     const ans = answers[c.id] || [];
@@ -154,6 +158,26 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
     ? orderValueNum * currentClientsNum
     : orderValueNum;
   const showCta = monthlyRevenue == null || monthlyRevenue >= 2500;
+
+  React.useEffect(() => {
+    if (!showCta) {
+      setCtaIsSticky(false);
+      return;
+    }
+
+    const sentinel = ctaSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+
+    const stickyTop = 18;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setCtaIsSticky(entry.boundingClientRect.top <= stickyTop),
+      { threshold: 0, rootMargin: `-${stickyTop}px 0px 0px 0px` }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [showCta]);
 
   return (
     <div className="cc-screen cc-results">
@@ -193,8 +217,20 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
 
       {/* CTA */}
       {showCta && (
-        <div className="cc-cta">
-          <div>
+        <>
+          <div ref={ctaSentinelRef} className="cc-cta-sentinel" aria-hidden="true" />
+          <div className={`cc-cta ${ctaStatic ? "cc-cta--static" : ""}`}>
+          <div className="cc-cta-copy">
+            {!ctaStatic && ctaIsSticky && (
+              <button
+                type="button"
+                className="cc-cta-close"
+                aria-label="Zet de sticky balk uit"
+                onClick={() => setCtaStatic(true)}
+              >
+                ×
+              </button>
+            )}
             <h2 className="cc-cta-h">{cta.heading || "Even praktisch meekijken?"}</h2>
             <p className="cc-cta-p">{cta.body || "Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen."}</p>
           </div>
@@ -217,7 +253,8 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
               {!submitDone ? "Laden…" : (cta.buttonLabel || "Plan een call")}
             </CCButton>
           </div>
-        </div>
+          </div>
+        </>
       )}
 
       {/* Visual chain */}
