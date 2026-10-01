@@ -157,7 +157,9 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
   const monthlyRevenue = (orderValueNum != null && currentClientsNum != null)
     ? orderValueNum * currentClientsNum
     : orderValueNum;
-  const showCta = monthlyRevenue == null || monthlyRevenue >= 2500;
+
+  // const showCta = monthlyRevenue == null || monthlyRevenue >= 2500;
+  const showCta = true;
 
   function openCalendly() {
     const base = calendly || cta.buttonUrl;
