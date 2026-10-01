@@ -430,12 +430,12 @@
 }
 
 .cc-cta {
-  background: var(--cc-navy); color: #fff; border-radius: 20px; padding: 24px;
+  background: #FFF3EC; color: #0D2A3D; border: 1.5px solid #F3CDB4; border-radius: 20px; padding: 24px;
   display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 20px;
   position: sticky;
   top: clamp(8px, 2vw, 18px);
   z-index: 4;
-  box-shadow: 0 14px 32px rgba(0, 46, 72, .18);
+  box-shadow: 0 14px 32px rgba(90, 67, 54, .12);
 }
 .cc-cta--static {
   position: relative;
@@ -445,8 +445,8 @@
   position: relative;
   padding-right: 40px;
 }
-.cc-cta-h { font-size: clamp(20px, 2.2vw, 26px); font-weight: 700; margin: 0 0 6px; color: #fff; }
-.cc-cta-p { margin: 0; max-width: 500px; opacity: .9; font-size: 14px; line-height: 1.5; }
+.cc-cta-h { font-size: clamp(20px, 2.2vw, 26px); font-weight: 700; margin: 0 0 6px; color: #0D2A3D; }
+.cc-cta-p { margin: 0; max-width: 500px; color: #5A4336; font-size: 14px; line-height: 1.5; }
 .cc-cta-right { display: flex; align-items: center; gap: 12px; }
 .cc-cta-close {
   display: none;
@@ -457,8 +457,8 @@
   height: 28px;
   border: 0;
   border-radius: 999px;
-  background: rgba(255,255,255,.14);
-  color: #fff;
+  background: rgba(13,42,61,.08);
+  color: #0D2A3D;
   cursor: pointer;
   font: inherit;
   font-size: 18px;
@@ -467,7 +467,7 @@
   justify-content: center;
 }
 .cc-cta-close:hover {
-  background: rgba(255,255,255,.22);
+  background: rgba(13,42,61,.14);
 }
 .cc-cta-restart {
   background: transparent; border: 0; color: rgba(255,255,255,.8);

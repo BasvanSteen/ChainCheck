@@ -159,6 +159,20 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
     : orderValueNum;
   const showCta = monthlyRevenue == null || monthlyRevenue >= 2500;
 
+  function openCalendly() {
+    const base = calendly || cta.buttonUrl;
+    if (!base) return;
+    try {
+      const u = new URL(base);
+      if (strategy?.firstName) u.searchParams.set("first_name", strategy.firstName);
+      if (strategy?.lastName)  u.searchParams.set("last_name", strategy.lastName);
+      if (strategy?.email)     u.searchParams.set("email", strategy.email);
+      window.open(u.toString(), "_blank");
+    } catch {
+      window.open(base, "_blank");
+    }
+  }
+
   React.useEffect(() => {
     if (!showCta) {
       setCtaIsSticky(false);
@@ -235,21 +249,9 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
             <p className="cc-cta-p">{cta.body || "Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen."}</p>
           </div>
           <div className="cc-cta-right">
-            <CCButton accent={accent} size="sm"
+            <CCButton accent="#D14407" size="sm"
               disabled={!submitDone || !(calendly || cta.buttonUrl)}
-              onClick={() => {
-                const base = calendly || cta.buttonUrl;
-                if (!base) return;
-                try {
-                  const u = new URL(base);
-                  if (strategy?.firstName) u.searchParams.set("first_name", strategy.firstName);
-                  if (strategy?.lastName)  u.searchParams.set("last_name",  strategy.lastName);
-                  if (strategy?.email)     u.searchParams.set("email",      strategy.email);
-                  window.open(u.toString(), "_blank");
-                } catch {
-                  window.open(base, "_blank");
-                }
-              }}>
+              onClick={openCalendly}>
               {!submitDone ? "Laden…" : (cta.buttonLabel || "Plan een call")}
             </CCButton>
           </div>
@@ -327,6 +329,23 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
           })}
         </div>
       </div>
+
+      {/* Bottom CTA */}
+      {showCta && (
+        <div className="cc-cta cc-cta--static">
+          <div className="cc-cta-copy">
+            <h2 className="cc-cta-h">{cta.heading || "Even praktisch meekijken?"}</h2>
+            <p className="cc-cta-p">{cta.body || "Boek een korte, vrijblijvende call — we bedenken samen waar jij vandaag kunt beginnen."}</p>
+          </div>
+          <div className="cc-cta-right">
+            <CCButton accent="#D14407" size="sm"
+              disabled={!submitDone || !(calendly || cta.buttonUrl)}
+              onClick={openCalendly}>
+              {!submitDone ? "Laden…" : "Bespreek mijn score in 10 minuten"}
+            </CCButton>
+          </div>
+        </div>
+      )}
 
       <div className="cc-results-restart">
         <button className="cc-cta-restart" onClick={onRestart}>Opnieuw doen</button>
