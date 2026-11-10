@@ -1,0 +1,408 @@
+{
+  "id": "geo-scan",
+  "slug": "geo-scan",
+  "name": "Klanten uit AI Scan",
+  "version": "0.1.0",
+  "tag": "geo-scan",
+  "calendly": "https://calendly.com/gameplan-team/gratis-sparringsessie",
+  "meta": {
+    "welcome": {
+      "badge": "Klanten uit AI Scan · gratis",
+      "title": "Noemt ChatGPT jou of jouw concurrent?",
+      "lead": "AI-tools als ChatGPT, Claude en Gemini noemen per vraag maar een handvol bedrijven. In 5 minuten zie je hoe klaar jouw website is om daartussen te staan, en welke schakel je tegenhoudt.",
+      "bullets": [
+        "Een score per schakel, van klantvragen tot meten",
+        "Je niveau: van onzichtbaar tot aanbevolen",
+        "Waar je begint voor de meeste klanten uit AI"
+      ],
+      "timeEstimate": "14 vragen · ~5 min"
+    },
+    "cta": {
+      "heading": "Bespreek je Scoren in AI-score",
+      "body": "In 10 minuten kijken we samen welke klantvragen jij moet winnen en waar je begint. Het kost je niets, en je weet daarna wat je eerste stap is.",
+      "buttonLabel": "Plan een gesprek"
+    },
+    "analysis": [
+      {
+        "maxScore": 10,
+        "level": "Onzichtbaar",
+        "headline": "Niveau 1 van 4. De kans is klein dat AI-tools jou nu noemen.",
+        "body": "En dat terwijl je wilt groeien{grow}. Je klant stelt zijn vragen steeds vaker aan ChatGPT, Claude en Gemini. Het goede nieuws: je bent niet te laat, je bent vroeg. Begin bij de vragen die je klant stelt en het beste antwoord daarop."
+      },
+      {
+        "maxScore": 20,
+        "level": "Bron",
+        "headline": "Niveau 2 van 4. AI kan je vinden, maar noemt je nog niet.",
+        "body": "Je website wordt misschien als bron gebruikt, maar in het antwoord staat een ander bedrijf. Om te groeien{grow} wil je in het antwoord staan, niet eronder. Versterk eerst je twee zwakste schakels."
+      },
+      {
+        "maxScore": 31,
+        "level": "Genoemd",
+        "headline": "Niveau 3 van 4. Je hebt de basis staan om klanten uit AI te halen.",
+        "body": "Bij een deel van de vragen kun je al genoemd worden. Met meer antwoordpagina's en meer bewijs maak je de stap naar aanbevolen, en dat helpt je groeien{grow}."
+      },
+      {
+        "level": "Aanbevolen",
+        "headline": "Niveau 4 van 4. Je website heeft wat AI-tools zoeken.",
+        "body": "Nu gaat het om tempo: meer vragen winnen voordat je concurrent het doet. Gebruik de uitslag om je laatste schakels te versterken en door te groeien{grow}."
+      }
+    ],
+    "scoreLabel": "Klanten uit AI-score",
+    "scoreDisplay": "levels",
+    "target": {
+      "tier": 3,
+      "chainPct": 0.75
+    }
+  },
+  "chains": [
+    {
+      "id": "vragen",
+      "title": "Vragen & prompts",
+      "lead": "AI-tools beantwoorden vragen. Weet je welke vragen jouw klant stelt vlak voordat hij koopt, dan weet je ook waar je moet staan.",
+      "verdicts": {
+        "strong": "Je weet welke vragen ertoe doen. Dat is het startpunt om klanten uit AI te halen, en daar sta je al.",
+        "warn": "Je hebt een idee van de vragen, maar nog geen scherpe lijst. Zonder die lijst schrijf je snel antwoorden op vragen die niemand stelt.",
+        "weak": "Hier begint het. Zolang je niet weet welke vragen jouw klant aan AI stelt, kun je er ook geen antwoord op geven."
+      },
+      "questions": [
+        {
+          "q": "Weet je welke vragen jouw ideale klant aan ChatGPT, Claude of Gemini stelt vlak voordat hij iets koopt of aanvraagt?",
+          "options": [
+            {
+              "label": "Ja, ik heb een lijst met de belangrijkste vragen en gebruik die voor mijn website.",
+              "score": 3
+            },
+            {
+              "label": "Ik heb wel een idee, maar het staat nergens op papier.",
+              "score": 1
+            },
+            {
+              "label": "Nee, daar heb ik nog niet naar gekeken.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Maak je onderscheid tussen vragen van mensen die willen kopen (\"wat kost...\", \"beste ... in Breda\", \"X of Y?\") en mensen die alleen informatie zoeken?",
+          "options": [
+            {
+              "label": "Ja, ik richt me eerst op de vragen waar omzet achter zit.",
+              "score": 3
+            },
+            {
+              "label": "Ik weet dat er verschil is, maar ik kies daar nog niet bewust in.",
+              "score": 1
+            },
+            {
+              "label": "Nee, dat onderscheid maak ik niet.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Weet je welke zoekwoorden bij die vragen horen, bijvoorbeeld via Google Autosuggest of een zoekwoordtool?",
+          "options": [
+            {
+              "label": "Ja, ik heb mijn belangrijkste zoekwoorden onderzocht en weet hoe vaak erop gezocht wordt.",
+              "score": 3
+            },
+            {
+              "label": "Ik ken er een paar, maar ik heb het niet echt onderzocht.",
+              "score": 1
+            },
+            {
+              "label": "Nee, ik weet niet welke zoekwoorden voor mij belangrijk zijn.",
+              "score": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "antwoord",
+      "title": "Beste antwoord",
+      "lead": "AI-tools noemen de website met het beste antwoord. Niet het kortste antwoord, wel het meest complete en het meest eigen.",
+      "verdicts": {
+        "strong": "Je pagina's geven echte antwoorden met jouw eigen kennis. Precies waar AI-tools naar zoeken.",
+        "warn": "Je hebt pagina's, maar er ontbreekt nog wat de zoeker verwacht. Dat gat dichten levert hier het meest op.",
+        "weak": "Je website geeft nog geen antwoorden die AI kan overnemen. Dit is de schakel die bepaalt of je genoemd wordt."
+      },
+      "questions": [
+        {
+          "q": "Heb je voor je belangrijkste klantvragen een eigen pagina die die vraag volledig beantwoordt?",
+          "options": [
+            {
+              "label": "Ja, per belangrijke vraag of dienst heb ik een pagina die echt antwoord geeft.",
+              "score": 3
+            },
+            {
+              "label": "Ik heb dienstenpagina's, maar die beantwoorden de vragen maar half.",
+              "score": 1
+            },
+            {
+              "label": "Nee, mijn informatie staat vooral op de homepage en een algemene pagina.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Staat er op je pagina's informatie die alleen jij kunt geven, zoals eigen ervaring, voorbeelden, cijfers of je werkwijze?",
+          "options": [
+            {
+              "label": "Ja, op elke pagina merk je dat wij dit vak verstaan.",
+              "score": 3
+            },
+            {
+              "label": "Soms, maar veel teksten zijn vrij algemeen of met AI geschreven zonder eigen inbreng.",
+              "score": 1
+            },
+            {
+              "label": "Nee, mijn teksten zijn vrij algemeen.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Beantwoord je ook wat iemand er standaard bij wil weten, zoals een prijsindicatie, doorlooptijd, voor wie het wel en niet is, en alternatieven?",
+          "options": [
+            {
+              "label": "Ja, een bezoeker hoeft nergens anders meer te kijken.",
+              "score": 3
+            },
+            {
+              "label": "Deels, er ontbreken onderwerpen waar mensen vaak naar vragen.",
+              "score": 1
+            },
+            {
+              "label": "Nee, daar heb ik nog niet over nagedacht.",
+              "score": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "publiceren",
+      "title": "Publiceren",
+      "lead": "Eén pagina is een begin. Wie 20, 50 of 80 klantvragen beantwoordt, wordt het antwoord in zijn vakgebied.",
+      "verdicts": {
+        "strong": "Je kunt snel publiceren en hebt al een flinke basis aan antwoordpagina's. Nu gaat het om tempo houden.",
+        "warn": "Je kunt publiceren, maar nog niet op schaal. Met AI kun je hier veel sneller gaan.",
+        "weak": "Antwoorden die niet online staan, worden niet gevonden. Zorg eerst dat je zelf pagina's live kunt zetten."
+      },
+      "questions": [
+        {
+          "q": "Kun je zelf, of met hulp van AI, snel een nieuwe pagina op je website zetten?",
+          "options": [
+            {
+              "label": "Ja, ik zet binnen een uur een nieuwe pagina live.",
+              "score": 3
+            },
+            {
+              "label": "Het lukt, maar het kost me veel tijd of ik heb mijn webbouwer nodig.",
+              "score": 1
+            },
+            {
+              "label": "Nee, ik kan of mag niet zelf in mijn website.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Hoeveel pagina's heb je die elk één specifieke klantvraag beantwoorden?",
+          "options": [
+            {
+              "label": "20 of meer",
+              "score": 3
+            },
+            {
+              "label": "6 tot 20",
+              "score": 2
+            },
+            {
+              "label": "1 tot 5",
+              "score": 1
+            },
+            {
+              "label": "Nog geen",
+              "score": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "techniek",
+      "title": "Leesbaar voor AI",
+      "lead": "Een AI-tool kan je alleen noemen als hij je website kan ophalen en begrijpen. Dat regel je één keer goed.",
+      "verdicts": {
+        "strong": "Zoekmachines en AI-tools kunnen je website goed ophalen en lezen. De basis is op orde.",
+        "warn": "De basis staat deels. Een paar technische stappen zorgen dat nieuwe pagina's sneller in AI-antwoorden terechtkomen.",
+        "weak": "De kans is groot dat AI-tools je pagina's slecht of niet ophalen. Dan helpt zelfs de beste tekst niet."
+      },
+      "questions": [
+        {
+          "q": "Is je website aangemeld bij Google Search Console en Bing Webmaster Tools, en controleer je of nieuwe pagina's worden opgepikt?",
+          "options": [
+            {
+              "label": "Ja, allebei aangemeld en ik controleer nieuwe pagina's.",
+              "score": 3
+            },
+            {
+              "label": "Alleen bij Google, of ik kijk er eigenlijk nooit in.",
+              "score": 1
+            },
+            {
+              "label": "Nee, of ik weet het niet.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Zijn je pagina's zo opgebouwd dat AI ze makkelijk kan samenvatten: een duidelijke kop per vraag, het antwoord direct eronder en veelgestelde vragen onderaan?",
+          "options": [
+            {
+              "label": "Ja, zo bouw ik mijn pagina's standaard op.",
+              "score": 3
+            },
+            {
+              "label": "Op sommige pagina's wel, op de meeste niet.",
+              "score": 1
+            },
+            {
+              "label": "Nee, het zijn vooral lange lappen tekst of vooral beeld.",
+              "score": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vertrouwen",
+      "title": "Vertrouwen",
+      "lead": "AI-tools noemen liever een bedrijf waar anderen ook over praten. Reviews en vermeldingen buiten je eigen website tellen mee.",
+      "verdicts": {
+        "strong": "Je hebt vertrouwen opgebouwd, op je eigen website en daarbuiten. Dat maakt de stap van genoemd naar aanbevolen kleiner.",
+        "warn": "Er is bewijs, maar het is nog niet zichtbaar genoeg. Meer reviews en vermeldingen maken het voor AI makkelijker om jou te noemen.",
+        "weak": "AI-tools vinden nog weinig bewijs dat jij de juiste keuze bent. Begin bij reviews en laat zien wie je bent."
+      },
+      "questions": [
+        {
+          "q": "Word je buiten je eigen website genoemd, bijvoorbeeld in Google-reviews, op branchesites, vergelijkingssites, in artikelen of podcasts?",
+          "options": [
+            {
+              "label": "Ja, op meerdere plekken, en ik werk er bewust aan.",
+              "score": 3
+            },
+            {
+              "label": "Een paar reviews of vermeldingen, maar ik doe er niets bewust voor.",
+              "score": 1
+            },
+            {
+              "label": "Nauwelijks, of ik weet het niet.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Zie je op je website direct wie erachter zit en waarom jij de expert bent, met naam, ervaring, cases en reviews?",
+          "options": [
+            {
+              "label": "Ja, dat staat op de pagina's waar het ertoe doet.",
+              "score": 3
+            },
+            {
+              "label": "Het staat op de over-ons-pagina, maar niet bij de antwoorden zelf.",
+              "score": 1
+            },
+            {
+              "label": "Nee, dat is nu niet duidelijk.",
+              "score": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meten",
+      "title": "Meten",
+      "lead": "Wat je niet test, weet je niet. Kijk of je al genoemd wordt, en of daar bezoekers en aanvragen uit komen.",
+      "verdicts": {
+        "strong": "Je weet waar je staat in AI-tools en ziet wat het oplevert. Zo stuur je op aanvragen in plaats van op gevoel.",
+        "warn": "Je hebt een eerste beeld, maar nog geen vaste meting. Zonder meting weet je niet welke pagina's werken.",
+        "weak": "Je weet nog niet of AI-tools je noemen. Even testen geeft vaak al een verrassend beeld."
+      },
+      "questions": [
+        {
+          "q": "Heb je getest of je genoemd wordt als je jouw belangrijkste klantvragen stelt aan ChatGPT, Gemini of Google AI-modus?",
+          "options": [
+            {
+              "label": "Ja, ik test dit regelmatig en word bij meerdere vragen genoemd.",
+              "score": 3
+            },
+            {
+              "label": "Ik heb het getest, maar ik word nog weinig of niet genoemd.",
+              "score": 1
+            },
+            {
+              "label": "Nee, dat heb ik nog nooit getest.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "q": "Meet je hoeveel bezoekers en aanvragen er via AI-tools binnenkomen, bijvoorbeeld chatgpt.com als bron in Google Analytics?",
+          "options": [
+            {
+              "label": "Ja, ik zie het verkeer uit AI-tools en kijk er elke maand naar.",
+              "score": 3
+            },
+            {
+              "label": "Ik heb Google Analytics, maar ik weet niet waar ik dit zie.",
+              "score": 1
+            },
+            {
+              "label": "Nee, dit meet ik niet.",
+              "score": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "strategy": {
+    "title": "Aanvullende gegevens",
+    "lead": "Nog een paar vragen over je situatie en je groeidoel, daarna je contactgegevens.",
+    "submitLabel": "Toon resultaat",
+    "steps": [
+      {
+        "id": "situatie",
+        "eyebrow": "Stap 1",
+        "title": "Huidige situatie",
+        "body": "Waar wil je over 6 tot 12 maanden staan?\n\nWie 200% wil groeien, pakt het anders aan dan wie 10% wil groeien. Jouw ambitie bepaalt waar je begint."
+      },
+      {
+        "id": "ambitie",
+        "eyebrow": "Stap 2",
+        "title": "Groeidoel en tijd",
+        "body": "Zo koppelen we de uitkomst aan een vervolgstap die past bij je doel en de tijd die je hebt."
+      },
+      {
+        "id": "contact",
+        "eyebrow": "Stap 3",
+        "title": "Contactgegevens",
+        "body": "Vul je gegevens in, dan kunnen we je bereiken en je website meenemen in het gesprek."
+      }
+    ],
+    "fields": [
+      {"id": "currentClients", "stepId": "situatie", "label": "Aantal klanten per maand", "type": "number", "required": false, "placeholder": "Bijv. 12"},
+      {"id": "orderValue", "stepId": "situatie", "label": "Gemiddelde waarde per klant (€)", "type": "number", "required": false, "placeholder": "Bijv. 750"},
+      {"id": "targetClients", "stepId": "ambitie", "label": "Gewenst aantal klanten per maand (indicatie)", "helper": "Bijvoorbeeld je doel voor de komende 6 tot 12 maanden.", "type": "number", "required": false, "placeholder": "Bijv. 20"},
+      {"id": "hoursPerWeek", "stepId": "ambitie", "label": "Hoeveel uur per week kun je hieraan besteden?", "helper": "Een schatting is genoeg.", "type": "number", "required": false, "placeholder": "Bijv. 4"},
+      {"id": "firstName", "stepId": "contact", "label": "Voornaam", "type": "text", "required": true, "placeholder": "Henk"},
+      {"id": "lastName", "stepId": "contact", "label": "Achternaam", "type": "text", "required": true, "placeholder": "de Vries"},
+      {"id": "email", "stepId": "contact", "label": "E-mailadres", "type": "email", "required": true, "placeholder": "jij@bedrijf.nl"},
+      {"id": "website", "stepId": "contact", "label": "Je website", "type": "text", "required": false, "placeholder": "jouwbedrijf.nl"}
+    ]
+  }
+}
