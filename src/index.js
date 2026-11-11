@@ -91,7 +91,13 @@ async function handleSubmit(request, env) {
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  const { slug, responseId, name, strategy, answers, version, referrer, shareUrl: incomingShareUrl } = body;
+  const { slug, responseId, name, strategy, answers, version, referrer, utm: rawUtm, shareUrl: incomingShareUrl } = body;
+  const utm = {};
+  if (rawUtm && typeof rawUtm === 'object') {
+    for (const [k, v] of Object.entries(rawUtm)) {
+      if (/^utm_[a-z_]+$/.test(k) && typeof v === 'string' && v) utm[k] = v.slice(0, 255);
+    }
+  }
   if (!slug) return json({ error: 'Missing required field: slug' }, 400);
 
   console.log('[submit] slug:', slug, '| responseId:', responseId || '(none)');
@@ -123,6 +129,7 @@ async function handleSubmit(request, env) {
           tag: set.tag,
           version,
           referrer,
+          utm: Object.keys(utm).length ? utm : undefined,
           shareUrl: incomingShareUrl,
           strategy,
           answers,

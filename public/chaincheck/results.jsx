@@ -7,6 +7,21 @@ function toneColor(tone) {
   return tone === "good" ? "#16A34A" : tone === "warn" ? "#EA580C" : "#DC2626";
 }
 
+// Capture UTM params on first load; persisted because the URL is rewritten after submit
+function captureUtm() {
+  try {
+    const found = {};
+    new URLSearchParams(window.location.search).forEach((v, k) => {
+      if (/^utm_[a-z_]+$/i.test(k) && v) found[k.toLowerCase()] = v;
+    });
+    if (Object.keys(found).length) sessionStorage.setItem("cc_utm", JSON.stringify(found));
+    return JSON.parse(sessionStorage.getItem("cc_utm") || "null");
+  } catch {
+    return null;
+  }
+}
+captureUtm();
+
 function toneLabel(tone) {
   return tone === "good" ? "Sterk" : tone === "warn" ? "Aandacht" : "Zwakke schakel";
 }
@@ -105,6 +120,7 @@ function Results({ answers, chains, chainVerdict, accent, meta, slug, onRestart,
       answers,
       version: meta?.version,
       referrer,
+      utm: captureUtm() || undefined,
       shareUrl: shareUrl || undefined,
     };
 
